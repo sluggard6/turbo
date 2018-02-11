@@ -1,0 +1,25 @@
+    apply plugin: 'java'
+    
+    
+    group = 'xyz.sluggard'
+    version = '1.0-SNAPSHOT'
+    
+    sourceCompatibility = 1.8
+	targetCompatibility = 1.8
+    
+    compileJava.options.encoding = 'UTF-8'
+    
+	repositories {
+        mavenLocal()
+        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+        jcenter()
+        mavenCentral()
+    }
+    
+    dependencies {
+        compile 'org.slf4j:slf4j-api:1.7.21'
+        compile 'log4j:log4j:1.2.17'
+        compile "org.projectlombok:lombok:1.16.18"
+
+        testCompile 'junit:junit:4.12'
+    }
