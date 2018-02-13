@@ -38,14 +38,14 @@ public class MatchEngine{
 //			return;
 //		}
 //		if(!match(buying, selling)) {
-//			buyingQueue.add(buying);
+//			myQueue.add(me);
 //			return;
 //		}else {
-//			if(selling.isDone()) {
-//				sellingQueue.poll();
+//			if(other.isDone()) {
+//				otherQueue.poll();
 //			}
-//			if(!buying.isDone()) {
-//				newBuy(buying);
+//			if(!me.isDone()) {
+//				doTrade(myQueue, otherQueue, me);
 //			}
 //		}
 //	}
