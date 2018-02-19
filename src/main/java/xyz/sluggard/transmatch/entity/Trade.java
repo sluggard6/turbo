@@ -19,4 +19,9 @@ public abstract class Trade {
 		return amount.compareTo(BigDecimal.ZERO) == 0;
 	}
 
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + " [id=" + id + ", price=" + price + ", amount=" + amount + ", timestamp=" + timestamp + "]";
+	}
+
 }

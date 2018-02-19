@@ -1,6 +1,8 @@
 package xyz.sluggard.transmatch.engine;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.PriorityQueue;
 
 import lombok.Setter;
@@ -102,8 +104,17 @@ public class MatchEngine{
 			return true;
 		}
 		return false;
-		
 	}
 
+	public Collection<Buying> getBuyingQueue() {
+		return Collections.unmodifiableCollection(buyingQueue);
+	}
 
+	public Collection<Selling> getSellingQueue() {
+		return Collections.unmodifiableCollection(sellingQueue);
+	}
+
+	
+	
+	
 }

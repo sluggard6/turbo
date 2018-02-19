@@ -11,7 +11,7 @@ import xyz.sluggard.transmatch.event.Event;
 @ToString
 public class Trans implements Event{
 	
-	private final String id = UUID.randomUUID().toString();
+	private final String id = UUID.randomUUID().toString().replaceAll("-", "");
 	
 	private final String buyingId;
 	
