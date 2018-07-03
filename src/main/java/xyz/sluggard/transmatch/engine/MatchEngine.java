@@ -21,7 +21,10 @@ public class MatchEngine{
 	@Setter
 	private EventService eventService;
 	
+	
+	
 	public synchronized void newTrade(Trade trade) {
+		eventService.deployOrderEvent(null);
 		if(trade instanceof Buying) {
 			newBuy((Buying) trade);
 			return;
@@ -100,7 +103,7 @@ public class MatchEngine{
 			buying.setAmount(buying.getAmount().subtract(min));
 			selling.setAmount(selling.getAmount().subtract(min));
 			Trans trans = new Trans(buying.getId(), selling.getId(), selling.getPrice(), min);
-			eventService.deployEvent(trans);
+			eventService.deployTradeEvent(null);
 			return true;
 		}
 		return false;

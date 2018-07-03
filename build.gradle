@@ -1,25 +1,39 @@
-    apply plugin: 'java'
-    
-    
-    group = 'xyz.sluggard'
-    version = '1.0-SNAPSHOT'
-    
-    sourceCompatibility = 1.8
-	targetCompatibility = 1.8
-    
-    compileJava.options.encoding = 'UTF-8'
-    
-	repositories {
-        mavenLocal()
-        maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
-        jcenter()
+buildscript {
+    repositories {
         mavenCentral()
     }
-    
     dependencies {
-        compile 'org.slf4j:slf4j-api:1.7.21'
-        compile 'log4j:log4j:1.2.17'
-        compile "org.projectlombok:lombok:1.16.18"
-
-        testCompile 'junit:junit:4.12'
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.0.3.RELEASE")
     }
+}
+    
+apply plugin: 'java'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+
+group = 'xyz.sluggard'
+version = '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+compileJava.options.encoding = 'UTF-8'
+
+repositories {
+    mavenLocal()
+    maven { url "http://maven.aliyun.com/nexus/content/groups/public/" }
+    jcenter()
+    mavenCentral()
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile 'org.springframework.kafka:spring-kafka:2.1.7.RELEASE'
+    compile 'org.slf4j:slf4j-api:1.7.21'
+    compile 'log4j:log4j:1.2.17'
+    compile "org.projectlombok:lombok:1.16.20"
+
+    compile("org.springframework.boot:spring-boot-devtools")
+    testCompile 'junit:junit:4.12'
+}
