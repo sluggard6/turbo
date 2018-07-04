@@ -1,9 +1,17 @@
 package xyz.sluggard.transmatch.service;
 
-import xyz.sluggard.transmatch.event.Event;
+import java.util.Set;
+
+import xyz.sluggard.transmatch.listener.EngineListener;
 
 public interface EventService {
 
-	void deployEvent(Event event);
+	void addListener(EngineListener listener);
+	
+	void removeListener(EngineListener listener);
+	
+	int countLinsteners();
+	
+	Set<EngineListener> getLinsteners();
 
 }

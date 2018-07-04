@@ -1,9 +1,9 @@
 package xyz.sluggard.transmatch.entity;
 
-public class Buying extends Trade implements Comparable<Buying> {
+public class BidOrder extends Order implements Comparable<BidOrder> {
 
 	@Override
-	public int compareTo(Buying o) {
+	public int compareTo(BidOrder o) {
 		int r = o.getPrice().compareTo(this.getPrice());
 		if(r == 0) {
 			return (int)(o.getTimestamp() - this.getTimestamp());

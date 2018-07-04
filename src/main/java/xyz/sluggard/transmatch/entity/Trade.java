@@ -1,27 +1,33 @@
 package xyz.sluggard.transmatch.entity;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
-@Data
-public abstract class Trade {
+@Getter
+@ToString
+public class Trade{
 	
-	private String id;
+	private final String id = UUID.randomUUID().toString().replaceAll("-", "");
 	
-	private BigDecimal price;
+	private final String buyingId;
 	
-	private BigDecimal amount;
+	private final String sellingId;
 	
-	private long timestamp;
+	private final BigDecimal price;
 	
-	public boolean isDone() {
-		return amount.compareTo(BigDecimal.ZERO) == 0;
-	}
+	private final BigDecimal amount;
+	
+	private final long timestamp = System.currentTimeMillis();
 
-	@Override
-	public String toString() {
-		return this.getClass().getSimpleName() + " [id=" + id + ", price=" + price + ", amount=" + amount + ", timestamp=" + timestamp + "]";
+	public Trade(String buyingId, String sellingId, BigDecimal price, BigDecimal amount) {
+		super();
+		this.buyingId = buyingId;
+		this.sellingId = sellingId;
+		this.price = price;
+		this.amount = amount;
 	}
 
 }
