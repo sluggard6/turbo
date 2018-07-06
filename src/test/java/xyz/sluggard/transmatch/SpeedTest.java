@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.util.Random;
 import java.util.UUID;
 
-import xyz.sluggard.transmatch.core.MatchEngine;
+import xyz.sluggard.transmatch.engine.MatchEngine;
 import xyz.sluggard.transmatch.entity.AskOrder;
 import xyz.sluggard.transmatch.entity.BidOrder;
 import xyz.sluggard.transmatch.entity.Order;
@@ -41,12 +41,11 @@ class CreateThread implements Runnable {
 		while(i < 1000) {
 			Order trade;
 			if(state) {
-				trade = new BidOrder();
+				trade = new BidOrder(UUID.randomUUID().toString().replaceAll("-", ""));
 			} else {
-				trade = new AskOrder();
+				trade = new AskOrder(UUID.randomUUID().toString().replaceAll("-", ""));
 			}
 			Random random = new Random();
-			trade.setId(UUID.randomUUID().toString().replaceAll("-", ""));
 			trade.setAmount(new BigDecimal(random.nextInt(50)+1));
 			trade.setPrice(new BigDecimal(random.nextInt(99)+1));
 			trade.setTimestamp(System.currentTimeMillis());

@@ -16,7 +16,7 @@ public interface EventService {
 	
 	Set<EngineListener> getLinsteners();
 
-	void deployEvent(Event event);
+	void publishEvent(Event event);
 	
 	void deployOrderEvent(Event event);
 	

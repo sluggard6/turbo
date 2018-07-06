@@ -1,7 +1,5 @@
 package xyz.sluggard.transmatch.service.impl;
 
-import java.util.Set;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -11,10 +9,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import xyz.sluggard.transmatch.event.Event;
-import xyz.sluggard.transmatch.listener.EngineListener;
 import xyz.sluggard.transmatch.service.EventService;
 
-public class EventServiceImpl implements EventService{
+public class EventServiceImpl extends AbstractEventService implements EventService{
 	
 	@Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
@@ -28,7 +25,7 @@ public class EventServiceImpl implements EventService{
 
 	@Override
 	@Async
-	public void deployEvent(Event event) {
+	public void publishEvent(Event event) {
 		System.out.print(i);
 		System.out.print(" : ");
 		System.out.println(event);
@@ -54,30 +51,6 @@ public class EventServiceImpl implements EventService{
 			e.printStackTrace();
 		}
 		
-	}
-
-	@Override
-	public void addListener(EngineListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void removeListener(EngineListener listener) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public int countLinsteners() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	@Override
-	public Set<EngineListener> getLinsteners() {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 }

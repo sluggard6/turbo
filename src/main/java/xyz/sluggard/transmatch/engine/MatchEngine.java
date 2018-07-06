@@ -11,6 +11,8 @@ import xyz.sluggard.transmatch.entity.AskOrder;
 import xyz.sluggard.transmatch.entity.BidOrder;
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Trade;
+import xyz.sluggard.transmatch.event.OrderEvent;
+import xyz.sluggard.transmatch.event.TradeEvent;
 import xyz.sluggard.transmatch.service.EventService;
 
 public class MatchEngine extends Observable{
@@ -23,6 +25,7 @@ public class MatchEngine extends Observable{
 	private EventService eventService;
 	
 	public synchronized void newOrder(Order order) {
+		eventService.publishEvent(new OrderEvent(order));
 		if(order instanceof BidOrder) {
 			newBuy((BidOrder) order);
 			return;
@@ -34,8 +37,12 @@ public class MatchEngine extends Observable{
 		}
 	}
 	
-	public synchronized void cancelOrder(String orderId) {
-		
+	public synchronized boolean cancelOrder(String orderId, boolean type) {
+		if(type) {
+			return bidQueue.remove(new BidOrder(orderId));
+		}else {
+			return askQueue.remove(new AskOrder(orderId));
+		}
 	}
 	
 //	private synchronized void doTrade(PriorityQueue<? super Trade> myQueue, PriorityQueue<? extends Trade> otherQueue, Trade me) {
@@ -105,6 +112,7 @@ public class MatchEngine extends Observable{
 			bidOrder.setAmount(bidOrder.getAmount().subtract(min));
 			askOrder.setAmount(askOrder.getAmount().subtract(min));
 			Trade trade = new Trade(bidOrder.getId(), askOrder.getId(), getPrice(bidOrder, askOrder), min);
+			eventService.publishEvent(new TradeEvent(trade));
 			return true;
 		}
 		return false;
