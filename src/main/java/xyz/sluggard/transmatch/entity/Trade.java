@@ -1,6 +1,6 @@
 package xyz.sluggard.transmatch.entity;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.UUID;
 
 import lombok.Getter;
@@ -16,13 +16,13 @@ public class Trade{
 	
 	private final String sellingId;
 	
-	private final BigDecimal price;
+	private final BigInteger price;
 	
-	private final BigDecimal amount;
+	private final BigInteger amount;
 	
 	private final long timestamp = System.currentTimeMillis();
 
-	public Trade(String buyingId, String sellingId, BigDecimal price, BigDecimal amount) {
+	public Trade(String buyingId, String sellingId, BigInteger price, BigInteger amount) {
 		super();
 		this.buyingId = buyingId;
 		this.sellingId = sellingId;

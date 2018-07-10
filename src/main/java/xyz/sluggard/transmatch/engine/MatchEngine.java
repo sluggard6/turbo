@@ -1,9 +1,8 @@
 package xyz.sluggard.transmatch.engine;
 
-import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Observable;
 import java.util.PriorityQueue;
 
 import lombok.Setter;
@@ -15,7 +14,9 @@ import xyz.sluggard.transmatch.event.OrderEvent;
 import xyz.sluggard.transmatch.event.TradeEvent;
 import xyz.sluggard.transmatch.service.EventService;
 
-public class MatchEngine extends Observable{
+public enum MatchEngine{
+	
+	ENGIN;
 	
 	private PriorityQueue<BidOrder> bidQueue = new PriorityQueue<>();
 	
@@ -45,6 +46,10 @@ public class MatchEngine extends Observable{
 		}
 	}
 	
+	public synchronized boolean cancelOrder(String orderId) {
+			return bidQueue.remove(new BidOrder(orderId)) || askQueue.remove(new AskOrder(orderId));
+	}
+	
 //	private synchronized void doTrade(PriorityQueue<? super Trade> myQueue, PriorityQueue<? extends Trade> otherQueue, Trade me) {
 //		Trade other = otherQueue.peek();
 //		if(other == null) {
@@ -64,7 +69,7 @@ public class MatchEngine extends Observable{
 //		}
 //	}
 	
-	public synchronized void newBuy(BidOrder bidOrder) {
+	private synchronized void newBuy(BidOrder bidOrder) {
 		AskOrder selling = askQueue.peek();
 		if(selling == null) {
 			bidQueue.add(bidOrder);
@@ -83,7 +88,7 @@ public class MatchEngine extends Observable{
 		}
 	}
 
-	public synchronized void newSell(AskOrder askOrder) {
+	private synchronized void newSell(AskOrder askOrder) {
 		BidOrder buying = bidQueue.peek();
 		if(buying == null) {
 			askQueue.add(askOrder);
@@ -108,7 +113,7 @@ public class MatchEngine extends Observable{
 
 	private final boolean match(BidOrder bidOrder, AskOrder askOrder) {
 		if(preMatch(bidOrder, askOrder)) {
-			BigDecimal min = bidOrder.getAmount().min(askOrder.getAmount());
+			BigInteger min = bidOrder.getAmount().min(askOrder.getAmount());
 			bidOrder.setAmount(bidOrder.getAmount().subtract(min));
 			askOrder.setAmount(askOrder.getAmount().subtract(min));
 			Trade trade = new Trade(bidOrder.getId(), askOrder.getId(), getPrice(bidOrder, askOrder), min);
@@ -118,7 +123,7 @@ public class MatchEngine extends Observable{
 		return false;
 	}
 	
-	private static final BigDecimal getPrice(Order o1, Order o2) {
+	private static final BigInteger getPrice(Order o1, Order o2) {
 		if(o1.getTimestamp() < o2.getUserId()) {
 			return o1.getPrice();
 		}else {

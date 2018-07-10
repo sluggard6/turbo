@@ -1,21 +1,19 @@
 package xyz.sluggard.transmatch;
 
-import java.math.BigDecimal;
 import java.util.Random;
 import java.util.UUID;
 
-import xyz.sluggard.transmatch.engine.MatchEngine;
 import xyz.sluggard.transmatch.entity.AskOrder;
 import xyz.sluggard.transmatch.entity.BidOrder;
 import xyz.sluggard.transmatch.entity.Order;
 
 public class SpeedTest {
 	
-	public static MatchEngine engin = new MatchEngine();
+//	public static MatchEngine engin = new MatchEngine();
 	
 	public static void main(String... args) throws Exception {
 //		engin.setEventService(new EventServiceImpl());
-////		Thread.currentThread().setDaemon(true);
+//		Thread.currentThread().setDaemon(true);
 //		Thread buyThread = new Thread(new CreateThread(true));
 //		Thread sellThread = new Thread(new CreateThread(false));
 //		buyThread.start();
@@ -46,8 +44,8 @@ class CreateThread implements Runnable {
 				trade = new AskOrder(UUID.randomUUID().toString().replaceAll("-", ""));
 			}
 			Random random = new Random();
-			trade.setAmount(new BigDecimal(random.nextInt(50)+1));
-			trade.setPrice(new BigDecimal(random.nextInt(99)+1));
+//			trade.setAmount(new BigInteger(random.nextInt(50)+1));
+//			trade.setPrice(new BigInteger(random.nextInt(99)+1));
 			trade.setTimestamp(System.currentTimeMillis());
 //			SpeedTest.engin.newTrade(trade);
 			System.out.println(trade);
