@@ -9,34 +9,39 @@ import org.springframework.stereotype.Component;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import xyz.sluggard.transmatch.event.Event;
+import lombok.extern.slf4j.Slf4j;
+import xyz.sluggard.transmatch.event.EngineEvent;
+import xyz.sluggard.transmatch.event.OrderEvent;
+import xyz.sluggard.transmatch.event.TradeEvent;
 import xyz.sluggard.transmatch.service.EventService;
 
 @Component
+@Slf4j
 public class EventServiceImpl extends AbstractEventService implements EventService{
 	
 	@Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 	
-	@Value("match.kafka.topic")
+	@Value("${engine.kafka.topic}")
 	private String topic;
 	
 	private ObjectMapper objectMapper = new ObjectMapper();
 	
-	private int i = 0;
 
 	@Override
 	@Async
-	public void publishEvent(Event event) {
-		System.out.print(i);
-		System.out.print(" : ");
-		System.out.println(event);
-		i++;
+	public void publishEvent(EngineEvent event) {
+		log.info(event.toString());
+		if(event instanceof OrderEvent) {
+			deployOrderEvent((OrderEvent) event);
+		}else if(event instanceof TradeEvent) {
+			deployTradeEvent((TradeEvent) event);
+		}
 	}
 
 	@Override
 	@Async
-	public void deployOrderEvent(Event event) {
+	public void deployOrderEvent(OrderEvent event) {
 		try {
 			kafkaTemplate.send(topic, objectMapper.writeValueAsString(event));
 		} catch (JsonProcessingException e) {
@@ -46,7 +51,7 @@ public class EventServiceImpl extends AbstractEventService implements EventServi
 
 	@Override
 	@Async
-	public void deployTradeEvent(Event event) {
+	public void deployTradeEvent(TradeEvent event) {
 		try {
 			kafkaTemplate.send(topic, objectMapper.writeValueAsString(event));
 		} catch (JsonProcessingException e) {

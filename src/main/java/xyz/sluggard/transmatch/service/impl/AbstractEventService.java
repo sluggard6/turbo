@@ -3,36 +3,29 @@ package xyz.sluggard.transmatch.service.impl;
 import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import xyz.sluggard.transmatch.event.Event;
+import xyz.sluggard.transmatch.event.EngineEvent;
 import xyz.sluggard.transmatch.listener.EngineListener;
 import xyz.sluggard.transmatch.service.EventService;
 
 public abstract class AbstractEventService implements EventService {
 
-	private static ExecutorService executorService;
-	
-	private Set<EngineListener> listeners;
+	private Set<EngineListener<? extends EngineEvent>> listeners;
 
 	public AbstractEventService() {
 		super();
 		listeners = new ConcurrentSkipListSet<>();
-		if(executorService.isShutdown()) {
-			executorService = Executors.newSingleThreadExecutor();
-		}
 	}
 
 	@Override
-	public void addListener(EngineListener listener) {
+	public void addListener(EngineListener<? extends EngineEvent> listener) {
 		if (listener == null)
             throw new NullPointerException();
 		listeners.add(listener);
 	}
 
 	@Override
-	public void removeListener(EngineListener listener) {
+	public void removeListener(EngineListener<? extends EngineEvent> listener) {
 		listeners.remove(listener);
 	}
 
@@ -42,7 +35,7 @@ public abstract class AbstractEventService implements EventService {
 	}
 
 	@Override
-	public Set<EngineListener> getLinsteners() {
+	public Set<EngineListener<? extends EngineEvent>> getLinsteners() {
 		return Collections.unmodifiableSet(listeners);
 	}
 	

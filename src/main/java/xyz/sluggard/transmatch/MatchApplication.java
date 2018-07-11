@@ -10,6 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.event.ApplicationContextEvent;
 import org.springframework.scheduling.annotation.EnableAsync;
 
+import com.viewfin.commons.system.Application;
+
 import xyz.sluggard.transmatch.engine.MatchEngine;
 import xyz.sluggard.transmatch.service.EventService;
 
@@ -18,6 +20,7 @@ import xyz.sluggard.transmatch.service.EventService;
 public class MatchApplication {
 	
 	public static void main(String... args) {
+		Application.setCurrentApplication(Application.ORDER);
 		ConfigurableApplicationContext cac = SpringApplication.run(MatchApplication.class, args);
 		cac.addApplicationListener(new ApplicationListener<ApplicationContextEvent>() {
 

@@ -4,7 +4,7 @@ import lombok.Data;
 import xyz.sluggard.transmatch.entity.Trade;
 
 @Data
-public class TradeEvent implements Event{
+public class TradeEvent implements EngineEvent{
 	
 	private final Trade trade;
 

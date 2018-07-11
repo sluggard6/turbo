@@ -29,7 +29,10 @@ spring:
 logging:
   level:
     root: info
-
+engine:
+  pair: ETHBTC
+  kafka:
+    topic: match_trade_ETHBTC
 
 
 
