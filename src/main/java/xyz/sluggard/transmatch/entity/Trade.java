@@ -1,33 +1,31 @@
 package xyz.sluggard.transmatch.entity;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 import java.util.UUID;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.ToString;
 
 @Getter
 @ToString
+@AllArgsConstructor
 public class Trade{
 	
 	private final String id = UUID.randomUUID().toString().replaceAll("-", "");
 	
-	private final String buyingId;
+	private final String bidOrderId;
 	
-	private final String sellingId;
+	private final String askOrderId;
 	
-	private final BigInteger price;
+	private final BigDecimal price;
 	
-	private final BigInteger amount;
+	private final BigDecimal amount;
+	
+	private final String makerOrderId;
+	
+	private final String takerOrderId;
 	
 	private final long timestamp = System.currentTimeMillis();
-
-	public Trade(String buyingId, String sellingId, BigInteger price, BigInteger amount) {
-		super();
-		this.buyingId = buyingId;
-		this.sellingId = sellingId;
-		this.price = price;
-		this.amount = amount;
-	}
 
 }

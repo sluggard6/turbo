@@ -1,6 +1,6 @@
-package xyz.sluggard.transmatch.listener;
+package xyz.sluggard.transmatch.actionevent.listener;
 
-import xyz.sluggard.transmatch.event.TradeEvent;
+import xyz.sluggard.transmatch.actionevent.event.TradeEvent;
 
 public interface TradeListener extends EngineListener<TradeEvent> {
 	

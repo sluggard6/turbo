@@ -9,7 +9,6 @@ import xyz.sluggard.transmatch.listener.EngineListener;
 
 public interface EventService {
 
-
 	void addListener(EngineListener<? extends EngineEvent> listener);
 	
 	void removeListener(EngineListener<? extends EngineEvent> listener);

@@ -1,6 +1,6 @@
-package xyz.sluggard.transmatch.listener;
+package xyz.sluggard.transmatch.actionevent.listener;
 
-import xyz.sluggard.transmatch.event.OrderEvent;
+import xyz.sluggard.transmatch.actionevent.event.OrderEvent;
 
 public interface OrderListener extends EngineListener<OrderEvent> {
 	

@@ -1,6 +1,6 @@
 package xyz.sluggard.transmatch.entity;
 
-import java.math.BigInteger;
+import java.math.BigDecimal;
 
 public abstract class Order {
 	
@@ -8,16 +8,18 @@ public abstract class Order {
 	
 	private Long userId;
 	
-	private BigInteger price;
+	private BigDecimal price;
 	
-	private BigInteger amount;
+	private BigDecimal amount;
 	
 	private long timestamp;
 	
-	public abstract String getType();
+	public abstract OrderType getOrderType();
+	
+	private TradeType tradeType;
 	
 	public boolean isDone() {
-		return amount.compareTo(BigInteger.ZERO) == 0;
+		return amount.compareTo(BigDecimal.ZERO) == 0;
 	}
 	
 	public String getId() {
@@ -36,19 +38,19 @@ public abstract class Order {
 		this.userId = userId;
 	}
 
-	public BigInteger getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
 
-	public void setPrice(BigInteger price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
 
-	public BigInteger getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(BigInteger amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
 
@@ -59,7 +61,18 @@ public abstract class Order {
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
 	}
+	
+	public TradeType getTradeType() {
+		return tradeType;
+	}
 
+	public void setTradeType(TradeType tradeType) {
+		this.tradeType = tradeType;
+	}
+
+	public void negate() {
+		amount = amount.negate();
+	}
 	@Override
 	public int hashCode() {
 		final int prime = 31;

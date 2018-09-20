@@ -17,8 +17,9 @@ public class AskOrder extends Order implements Comparable<AskOrder>{
 	}
 
 	@Override
-	public String getType() {
-		return "ask";
+	public OrderType getOrderType() {
+		return OrderType.ASK;
 	}
+
 
 }

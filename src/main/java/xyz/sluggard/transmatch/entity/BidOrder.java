@@ -17,8 +17,8 @@ public class BidOrder extends Order implements Comparable<BidOrder> {
 	}
 
 	@Override
-	public String getType() {
-		return "bid";
+	public OrderType getOrderType() {
+		return OrderType.BID;
 	}
 
 }
