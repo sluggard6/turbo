@@ -1,20 +1,21 @@
 package xyz.sluggard.transmatch.event;
 
-import lombok.ToString;
+import lombok.Getter;
+import xyz.sluggard.transmatch.core.Engine;
 import xyz.sluggard.transmatch.entity.Order;
 
-@ToString
-public class OrderEvent implements EngineEvent {
+@Getter
+public class OrderEvent extends EngineEvent {
 	
-	private final Order order;
-	
-	public OrderEvent(Order order) {
-		super();
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	public OrderEvent(Order order, Engine engine) {
+		super(engine);
 		this.order = order;
 	}
 
-	public Order getOrder() {
-		return order;
-	}
-	
+	private final Order order;
 }

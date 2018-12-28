@@ -1,16 +1,21 @@
 package xyz.sluggard.transmatch.event;
 
-import lombok.Data;
+import lombok.Getter;
+import xyz.sluggard.transmatch.core.Engine;
 import xyz.sluggard.transmatch.entity.Trade;
 
-@Data
-public class TradeEvent implements EngineEvent{
+@Getter
+public class TradeEvent extends EngineEvent{
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private final Trade trade;
 
-	public TradeEvent(Trade trade) {
-		super();
+	public TradeEvent(Trade trade, Engine engine) {
+		super(engine);
 		this.trade = trade;
 	}
-
+	
 }

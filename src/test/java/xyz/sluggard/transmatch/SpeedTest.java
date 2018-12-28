@@ -3,8 +3,6 @@ package xyz.sluggard.transmatch;
 import java.util.Random;
 import java.util.UUID;
 
-import xyz.sluggard.transmatch.entity.AskOrder;
-import xyz.sluggard.transmatch.entity.BidOrder;
 import xyz.sluggard.transmatch.entity.Order;
 
 public class SpeedTest {
@@ -35,22 +33,22 @@ class CreateThread implements Runnable {
 
 	@Override
 	public void run() {
-		int i = 0;
-		while(i < 1000) {
-			Order trade;
-			if(state) {
-				trade = new BidOrder(UUID.randomUUID().toString().replaceAll("-", ""));
-			} else {
-				trade = new AskOrder(UUID.randomUUID().toString().replaceAll("-", ""));
-			}
-			Random random = new Random();
+//		int i = 0;
+//		while(i < 1000) {
+//			Order trade;
+//			if(state) {
+//				trade = new Order(UUID.randomUUID().toString().replaceAll("-", ""));
+//			} else {
+//				trade = new Order(UUID.randomUUID().toString().replaceAll("-", ""));
+//			}
+//			Random random = new Random();
 //			trade.setAmount(new BigInteger(random.nextInt(50)+1));
 //			trade.setPrice(new BigInteger(random.nextInt(99)+1));
-			trade.setTimestamp(System.currentTimeMillis());
+//			trade.setTimestamp(System.currentTimeMillis());
 //			SpeedTest.engin.newTrade(trade);
-			System.out.println(trade);
-			i++;
-		}
+//			System.out.println(trade);
+//			i++;
+//		}
 	}
 	
 }

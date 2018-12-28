@@ -1,61 +1,8 @@
-spring:
-  #============== kafka ===================
-  kafka:
-    bootstrap-servers: 10.10.10.180:9092,10.10.10.190:9092,10.10.10.200:9092
-#    bootstrap-servers: 127.0.0.1:9092
-#    bootstrap-servers: 10.10.10.146:9092
-    producer:
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.apache.kafka.common.serialization.StringSerializer
-    topics: match_trade_ETCUSD
-            match_trade_TRXUSD
-            match_trade_EOSUSD
-            match_trade_LTCUSD
-            match_trade_BCHUSD
-            match_trade_BTCUSD
-            match_trade_ETHUSD
-            match_trade_ETCBTC
-            match_trade_TRXBTC
-            match_trade_EOSBTC
-            match_trade_LTCBTC
-            match_trade_BCHBTC
-            match_trade_ETHBTC
-            match_trade_ETCETH
-            match_trade_TRXETH
-            match_trade_EOSETH
-            match_trade_LTCETH
-            match_trade_BCHETH
-
-  data:
-    mongodb:
-      uri: mongodb://viewfin:dev@10.10.10.146:27017/rifles
-
-
-mybatis:
- mapper-locations: classpath:mapper/*.xml
- type-aliases-package:
-
-#pagehelper
-pagehelper:
-    helperDialect: mysql
-    reasonable: true
-    supportMethodsArguments: true
-    params: count=countSql
-    returnPageInfo: check
-
-#influxdb配置
-rifles:
-  influxdb:
-    dbname: rifles
-    url: http://10.10.10.146:8086
-    username:
-    password:
-
  #日志配置
 logging:
   level:
     root: info
-
+currencyPair: ETH_BTC
 
 
 

@@ -5,7 +5,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
 import xyz.sluggard.transmatch.event.EngineEvent;
-import xyz.sluggard.transmatch.listener.EngineListener;
+import xyz.sluggard.transmatch.event.EngineListener;
 import xyz.sluggard.transmatch.service.EventService;
 
 public abstract class AbstractEventService implements EventService {
