@@ -1,15 +1,5 @@
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.1.1.RELEASE")
-    }
-}
-    
 apply plugin: 'java'
-apply plugin: 'org.springframework.boot'
-apply plugin: 'io.spring.dependency-management'
+apply plugin: 'maven'
 
 
 group = 'xyz.sluggard'
@@ -28,11 +18,14 @@ repositories {
 }
 
 dependencies {
-    compile("org.springframework.boot:spring-boot-starter-web")
     compile 'org.slf4j:slf4j-api:1.7.21'
-    compile "org.projectlombok:lombok:1.16.20"
+    compile "org.projectlombok:lombok:1.18.4"
     compile 'io.springfox:springfox-swagger-ui:2.8.0'
     compile 'io.springfox:springfox-swagger2:2.8.0'
-    //compile("org.springframework.boot:spring-boot-devtools")
     testCompile 'junit:junit:4.12'
+}
+
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }

@@ -4,6 +4,8 @@ import java.util.Collection;
 
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
+import xyz.sluggard.transmatch.service.EventService;
+import xyz.sluggard.transmatch.service.InitService;
 
 public interface Engine {
 	
@@ -18,5 +20,9 @@ public interface Engine {
 	Collection<Order> getBidQueue();
 
 	Collection<Order> getAskQueue();
+
+	void setEventService(EventService eventService);
+
+	void setInitService(InitService initService);
 	
 }

@@ -16,13 +16,11 @@ import java.util.concurrent.PriorityBlockingQueue;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import lombok.Data;
-import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import xyz.sluggard.transmatch.core.Engine;
 import xyz.sluggard.transmatch.entity.Order;
-import xyz.sluggard.transmatch.entity.Trade;
 import xyz.sluggard.transmatch.entity.Order.Side;
+import xyz.sluggard.transmatch.entity.Trade;
 import xyz.sluggard.transmatch.event.CancelEvent;
 import xyz.sluggard.transmatch.event.EngineDestoryEvent;
 import xyz.sluggard.transmatch.event.EngineStartUpEvent;
@@ -33,7 +31,6 @@ import xyz.sluggard.transmatch.service.EventService;
 import xyz.sluggard.transmatch.service.InitService;
 
 @Slf4j
-@Data
 public class ExecutorEngine implements Engine{
 	
 	static PriorityBlockingQueue<Order> bidQueue = new PriorityBlockingQueue<>();
@@ -43,20 +40,25 @@ public class ExecutorEngine implements Engine{
 	private String currencyPair;
 	
 	public ExecutorEngine(String currencyPair) {
+		this(currencyPair, null, null);
+	}
+	
+	public ExecutorEngine(String currencyPair, EventService eventService, InitService initService) {
 		if(currencyPair == null || currencyPair.trim().length() == 0) {
 			throw new NullPointerException("currencyPair can't be null");
 		}
 		this.currencyPair = currencyPair;
+		this.eventService = eventService;
+		this.initService = initService;
 	}
+	
 
 	private ExecutorService executorService;
 	
 	private static final long TIME_OUT = 5000;
 
-	@Setter
 	private EventService eventService;
 	
-	@Setter
 	private InitService initService;
 	
 	@PostConstruct
@@ -80,6 +82,16 @@ public class ExecutorEngine implements Engine{
 	public void destory() {
 		executorService.shutdown();
 		eventService.publishEvent(new EngineDestoryEvent(this));
+	}
+
+	@Override
+	public void setEventService(EventService eventService) {
+		this.eventService = eventService;
+	}
+
+	@Override
+	public void setInitService(InitService initService) {
+		this.initService = initService;
 	}
 
 	@Override
@@ -290,7 +302,7 @@ public class ExecutorEngine implements Engine{
 			return new MatchPrice(o2, o1);
 		}
 	}
-	
+
 	private static class MatchPrice {
 		private final Order maker;
 		

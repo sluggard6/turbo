@@ -1,9 +1,5 @@
 package xyz.sluggard.transmatch;
 
-import static org.junit.Assert.assertEquals;
-
-import java.math.BigDecimal;
-
 import org.junit.Test;
 
 public class BigDecimalTest {
