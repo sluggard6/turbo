@@ -1,10 +1,12 @@
 package xyz.sluggard.transmatch.event;
 
 import lombok.Getter;
+import lombok.ToString;
 import xyz.sluggard.transmatch.core.Engine;
 import xyz.sluggard.transmatch.entity.Order;
 
 @Getter
+@ToString
 public class MakerEvent extends EngineEvent {
 	
 	/**

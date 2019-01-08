@@ -7,13 +7,11 @@ import xyz.sluggard.transmatch.event.EngineListener;
 
 public interface EventService {
 
-	void addListener(EngineListener<? extends EngineEvent> listener);
-	
-	void removeListener(EngineListener<? extends EngineEvent> listener);
+	void addListener(EngineListener listener);
 	
 	int countLinsteners();
 	
-	Set<EngineListener<? extends EngineEvent>> getLinsteners();
+	Set<EngineListener> getLinsteners();
 	
 	default void publishEvent(EngineEvent event) {
 		getLinsteners().forEach(listener -> {

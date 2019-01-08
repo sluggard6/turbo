@@ -2,8 +2,9 @@ package xyz.sluggard.transmatch.event;
 
 import xyz.sluggard.transmatch.core.Engine;
 
-public class EngineStartUpEvent extends EngineEvent {
 
+public class EngineStartUpEvent extends EngineEvent {
+	
 	/**
 	 * 
 	 */

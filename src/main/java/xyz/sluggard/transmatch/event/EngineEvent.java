@@ -15,13 +15,17 @@ public abstract class EngineEvent extends EventObject {
 		super(engine);
 	}
 
-
 	public String getEventName() {
 		return this.getClass().getSimpleName();
 	}
 	
 	public String getCurrencyPair() {
 		return ((Engine) source).getCurrencyPair();
+	}
+
+	@Override
+	public String toString() {
+		return this.getClass().getSimpleName() + "(currencyPai:" + getCurrencyPair() + ")";
 	}
 
 }

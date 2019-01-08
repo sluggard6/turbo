@@ -1,11 +1,14 @@
 package xyz.sluggard.transmatch.entity;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-public class Order {
+@NoArgsConstructor
+public class Order implements Comparable<Order>{
 	
 	private String id;
 	
@@ -13,9 +16,11 @@ public class Order {
 	
 	private BigDecimal amount;
 	
-	private long timestamp;
+	private long timestamp = System.currentTimeMillis();
 	
 	private Side side;
+	
+	private Type type;
 	
 	private String extend;
 	
@@ -39,4 +44,52 @@ public class Order {
 		ASK,BID
 	}
 	
+	public enum Type {
+		LIMIT,MARKET
+	}
+
+	@Override
+	public int compareTo(Order o) {
+		if(!side.equals(o.getSide())) {
+			throw new IllegalArgumentException("askorder can't compare to bidorder");
+		}
+		int i = price.compareTo(o.getPrice());
+		if(i == 0) {
+			return (int) (timestamp - o.getTimestamp());
+		}
+		if(isAsk()) {
+			return i;
+		}else {
+			return i*(-1);
+		}
+	}
+	
+	public Order(BigDecimal amount, Side side) {
+		this(null, null, amount, side, Type.MARKET, null);
+	}
+	
+	public Order(BigDecimal price, BigDecimal amount, Side side) {
+		this(null, price, amount, side, null);
+	}
+	
+	public Order(String id,BigDecimal price, BigDecimal amount, Side side) {
+		this(id, price, amount, side, Type.LIMIT, null);
+	}
+	
+	public Order(String id,BigDecimal price, BigDecimal amount, Side side, String extend) {
+		this(null, price, amount, side, Type.LIMIT, null);
+	}
+	
+	public Order(String id,BigDecimal price, BigDecimal amount, Side side, Type type, String extend) {
+		if(id == null) {
+			id = UUID.randomUUID().toString().replaceAll("-", "");
+		}else {
+			this.id = id;
+		}
+		this.price = price;
+		this.amount = amount;
+		this.side = side;
+		this.type = type;
+		this.extend = extend;
+	}
 }

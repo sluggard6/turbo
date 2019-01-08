@@ -4,13 +4,12 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
 
-import xyz.sluggard.transmatch.event.EngineEvent;
 import xyz.sluggard.transmatch.event.EngineListener;
 import xyz.sluggard.transmatch.service.EventService;
 
 public abstract class AbstractEventService implements EventService {
 
-	private Set<EngineListener<? extends EngineEvent>> listeners;
+	private Set<EngineListener> listeners;
 
 	public AbstractEventService() {
 		super();
@@ -18,14 +17,13 @@ public abstract class AbstractEventService implements EventService {
 	}
 
 	@Override
-	public void addListener(EngineListener<? extends EngineEvent> listener) {
+	public void addListener(EngineListener listener) {
 		if (listener == null)
             throw new NullPointerException();
 		listeners.add(listener);
 	}
 
-	@Override
-	public void removeListener(EngineListener<? extends EngineEvent> listener) {
+	public void removeListener(EngineListener listener) {
 		listeners.remove(listener);
 	}
 
@@ -35,7 +33,7 @@ public abstract class AbstractEventService implements EventService {
 	}
 
 	@Override
-	public Set<EngineListener<? extends EngineEvent>> getLinsteners() {
+	public Set<EngineListener> getLinsteners() {
 		return Collections.unmodifiableSet(listeners);
 	}
 	

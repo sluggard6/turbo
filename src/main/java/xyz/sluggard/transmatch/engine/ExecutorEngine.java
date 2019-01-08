@@ -29,6 +29,8 @@ import xyz.sluggard.transmatch.event.OrderEvent;
 import xyz.sluggard.transmatch.event.TradeEvent;
 import xyz.sluggard.transmatch.service.EventService;
 import xyz.sluggard.transmatch.service.InitService;
+import xyz.sluggard.transmatch.service.impl.EventServiceImpl;
+import xyz.sluggard.transmatch.service.impl.NoneInitServiceImpl;
 
 @Slf4j
 public class ExecutorEngine implements Engine{
@@ -40,7 +42,11 @@ public class ExecutorEngine implements Engine{
 	private String currencyPair;
 	
 	public ExecutorEngine(String currencyPair) {
-		this(currencyPair, null, null);
+		this(currencyPair, new EventServiceImpl(), new NoneInitServiceImpl());
+	}
+	
+	public ExecutorEngine(String currencyPair, EventService eventService) {
+		this(currencyPair, eventService, new NoneInitServiceImpl());
 	}
 	
 	public ExecutorEngine(String currencyPair, EventService eventService, InitService initService) {
@@ -61,8 +67,9 @@ public class ExecutorEngine implements Engine{
 	
 	private InitService initService;
 	
+	@Override
 	@PostConstruct
-	public void init() {
+	public void start() {
 		try {
 			if (executorService != null && !executorService.isShutdown())
 				throw new IllegalStateException();
@@ -78,18 +85,22 @@ public class ExecutorEngine implements Engine{
 		}
 	}
 	
+	@Override
 	@PreDestroy
-	public void destory() {
+	public void stop() {
 		executorService.shutdown();
 		eventService.publishEvent(new EngineDestoryEvent(this));
 	}
-
+	
 	@Override
+	public EventService getEventService() {
+		return eventService;
+	}
+
 	public void setEventService(EventService eventService) {
 		this.eventService = eventService;
 	}
 
-	@Override
 	public void setInitService(InitService initService) {
 		this.initService = initService;
 	}
@@ -141,6 +152,11 @@ public class ExecutorEngine implements Engine{
 		return Collections.unmodifiableCollection(bidQueue);
 	}
 	
+	@Override
+	public String toString() {
+		return "ExecutorEngine [currencyPair=" + currencyPair + "]";
+	}
+
 	private class Command implements Callable<Boolean> {
 		
 		private boolean cancal;
@@ -318,4 +334,5 @@ public class ExecutorEngine implements Engine{
 		}
 		
 	}
+
 }

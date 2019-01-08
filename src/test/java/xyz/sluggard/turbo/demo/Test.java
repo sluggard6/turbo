@@ -1,11 +1,3 @@
-# turbo
-
-A Market Order Matching Engine
-
-
-## Getting started
-
-```java
 package xyz.sluggard.turbo.demo;
 
 import java.math.BigDecimal;
@@ -42,5 +34,3 @@ public class Test {
 	}
 
 }
-
-```
