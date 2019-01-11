@@ -16,9 +16,11 @@ public class Order implements Comparable<Order>{
 	
 	private BigDecimal amount;
 	
-	private long timestamp = System.currentTimeMillis();
+	private long timestamp = System.nanoTime();
 	
 	private Side side;
+	
+	private transient boolean booleanSide;
 	
 	private Type type;
 	
@@ -29,11 +31,11 @@ public class Order implements Comparable<Order>{
 	}
 	
 	public boolean isAsk() {
-		return side == Side.ASK;
+		return booleanSide;
 	}
 	
 	public boolean isBid() {
-		return side == Side.BID;
+		return !booleanSide;
 	}
 
 	public void negate() {
@@ -53,8 +55,14 @@ public class Order implements Comparable<Order>{
 		if(!side.equals(o.getSide())) {
 			throw new IllegalArgumentException("askorder can't compare to bidorder");
 		}
-		int i = price.compareTo(o.getPrice());
-		if(i == 0) {
+		int i = o.type.ordinal() - type.ordinal();
+		if(i != 0) return i;
+		if(type.equals(Type.LIMIT)) {
+			i = price.compareTo(o.getPrice());
+			if(i == 0) {
+				return (int) (timestamp - o.getTimestamp());
+			}
+		}else {
 			return (int) (timestamp - o.getTimestamp());
 		}
 		if(isAsk()) {
@@ -77,7 +85,7 @@ public class Order implements Comparable<Order>{
 	}
 	
 	public Order(String id,BigDecimal price, BigDecimal amount, Side side, String extend) {
-		this(null, price, amount, side, Type.LIMIT, null);
+		this(null, price, amount, side, Type.LIMIT, extend);
 	}
 	
 	public Order(String id,BigDecimal price, BigDecimal amount, Side side, Type type, String extend) {
@@ -91,5 +99,6 @@ public class Order implements Comparable<Order>{
 		this.side = side;
 		this.type = type;
 		this.extend = extend;
+		this.booleanSide = side.equals(Side.ASK);
 	}
 }

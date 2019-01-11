@@ -23,10 +23,6 @@ public abstract class AbstractEventService implements EventService {
 		listeners.add(listener);
 	}
 
-	public void removeListener(EngineListener listener) {
-		listeners.remove(listener);
-	}
-
 	@Override
 	public int countLinsteners() {
 		return listeners.size();
