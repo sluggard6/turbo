@@ -92,7 +92,7 @@ public class Order implements Comparable<Order>{
 	
 	public Order(String id,BigDecimal price, BigDecimal amount, Side side, Type type, String extend) {
 		if(id == null) {
-			id = UUID.randomUUID().toString().replaceAll("-", "");
+			this.id = UUID.randomUUID().toString().replaceAll("-", "");
 		}else {
 			this.id = id;
 		}

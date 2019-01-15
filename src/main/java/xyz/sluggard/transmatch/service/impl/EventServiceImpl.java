@@ -42,6 +42,9 @@ public class EventServiceImpl extends AbstractEventService{
 
 	@Override
 	public void publishEvent(EngineEvent event) {
+		if(event == null) {
+			throw new NullPointerException();
+		}
 		if(localListeners == null) return;
 		executorService.execute(new PublishCommand(event));
 	}
