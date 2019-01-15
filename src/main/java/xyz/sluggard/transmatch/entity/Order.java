@@ -16,7 +16,9 @@ public class Order implements Comparable<Order>{
 	
 	private BigDecimal amount;
 	
-	private long timestamp = System.nanoTime();
+	private long nanotime = System.nanoTime();
+	
+	private long timestamp = System.currentTimeMillis();
 	
 	private Side side;
 	
@@ -60,10 +62,10 @@ public class Order implements Comparable<Order>{
 		if(type.equals(Type.LIMIT)) {
 			i = price.compareTo(o.getPrice());
 			if(i == 0) {
-				return (int) (timestamp - o.getTimestamp());
+				return (int) (nanotime - o.getNanotime());
 			}
 		}else {
-			return (int) (timestamp - o.getTimestamp());
+			return (int) (nanotime - o.getNanotime());
 		}
 		if(isAsk()) {
 			return i;

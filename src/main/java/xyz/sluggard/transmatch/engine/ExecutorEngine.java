@@ -196,12 +196,56 @@ public class ExecutorEngine implements Engine{
 						return cancelOrderIter(bidQueue, orderId) != null;
 					}
 				}else {
-					newOrder(order);
+//					newOrder(order);
+					newBooleanOrder(order);
 					return true;
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				return false;
+			}
+		}
+		
+		private void newBooleanOrder(Order order) {
+			eventService.publishEvent(new OrderEvent(order, ExecutorEngine.this));
+			Order op = getOppositeQueue(order.isBooleanSide()).peek();
+			if(op == null) {
+				addSameQueue(order);
+				return;
+			}
+			if(!noneMatch(order, op)) {
+				addSameQueue(order);
+				return;
+			}else {
+				if(op.isDone()) {
+					getOppositeQueue(order.isBooleanSide()).poll();
+				}
+				if(!order.isDone()) {
+					newBooleanOrder(order);
+				}
+			}
+		}
+		
+
+		private void addSameQueue(Order order) {
+			eventService.publishEvent(new MakerEvent(order, ExecutorEngine.this));
+			getSameQueue(order.isBooleanSide()).add(order);
+			
+		}
+
+		private Queue<Order> getOppositeQueue(boolean booleanSide) {
+			if(booleanSide) {
+				return askQueue;
+			}else {
+				return bidQueue;
+			}
+		}
+		
+		private Queue<Order> getSameQueue(boolean booleanSide) {
+			if(booleanSide) {
+				return bidQueue;
+			}else {
+				return askQueue;
 			}
 		}
 
@@ -270,6 +314,16 @@ public class ExecutorEngine implements Engine{
 			return false;
 		}
 		
+		private final boolean noneMatch(Order o1, Order o2) {
+			if(o1.isBooleanSide() && !o2.isBooleanSide()) {
+				return match(o2,o1);
+			}else if(o2.isBooleanSide() && !o1.isBooleanSide()) {
+				return match(o1,o2);
+			}else {
+				throw new IllegalArgumentException("same side order can't make trade");
+			}
+		}
+		
 		private void newOrder(Order order) {
 			eventService.publishEvent(new OrderEvent(order, ExecutorEngine.this));
 			switch (order.getSide()) {
@@ -283,6 +337,8 @@ public class ExecutorEngine implements Engine{
 				throw new IllegalArgumentException("unknow trade type : " + order.getSide());
 			}
 		}
+		
+		
 		
 		/**
 		 * @deprecated "不推荐使用，取消订单尽量提前确实是买单还是卖单"

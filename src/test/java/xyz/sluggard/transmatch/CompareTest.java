@@ -15,11 +15,6 @@ public class CompareTest {
 	public void bidCompareTest() {
 		Order order1 = new Order(new BigDecimal("100"), new BigDecimal(100), Side.BID);
 		Order order2 = new Order(new BigDecimal("90"), new BigDecimal(100), Side.BID);
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		Order order3 = new Order(new BigDecimal("100"), new BigDecimal(100), Side.BID);
 		assertTrue(order1.compareTo(order2)<0);
 		assertTrue(order1.compareTo(order3)<0);
@@ -30,11 +25,6 @@ public class CompareTest {
 	public void askCompareTest() {
 		Order order1 = new Order(new BigDecimal("100"), new BigDecimal(100), Side.ASK);
 		Order order2 = new Order(new BigDecimal("90"), new BigDecimal(100), Side.ASK);
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
 		Order order3 = new Order(new BigDecimal("100"), new BigDecimal(100), Side.ASK);
 		assertTrue(order1.compareTo(order2)>0);
 		assertTrue(order1.compareTo(order3)<0);
@@ -48,4 +38,18 @@ public class CompareTest {
 		order1.compareTo(order2);
 	}
 	
+	@Test
+	public void marketCompile() {
+		Order order1 = new Order(new BigDecimal(100), Side.ASK);
+		Order order2 = new Order(new BigDecimal(100), Side.ASK);
+		assertTrue(order1.compareTo(order2)<0);
+	}
+	
+	
+	@Test
+	public void marketLimitCompile() {
+		Order order1 = new Order(new BigDecimal(100), new BigDecimal(100), Side.ASK);
+		Order order2 = new Order(new BigDecimal(100), Side.ASK);
+		assertTrue(order1.compareTo(order2)>0);
+	}
 }

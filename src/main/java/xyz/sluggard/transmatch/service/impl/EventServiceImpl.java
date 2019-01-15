@@ -29,7 +29,7 @@ public class EventServiceImpl extends AbstractEventService{
 		localListeners = new ThreadLocal<Set<EngineListener>>() {
 			@Override 
 			protected Set<EngineListener> initialValue() {
-				return EventServiceImpl.this.getLinsteners();
+				return EventServiceImpl.super.getLinsteners();
 			}
 		};
 	}
