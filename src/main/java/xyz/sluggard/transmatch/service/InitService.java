@@ -4,8 +4,8 @@ import java.util.List;
 
 import xyz.sluggard.transmatch.entity.Order;
 
-public interface InitService {
+public interface InitService<O extends Order> {
 	
-	List<Order> initOrder();
+	List<O> initOrder();
 
 }

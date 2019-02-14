@@ -3,6 +3,7 @@ package xyz.sluggard.transmatch.event;
 import java.util.EventObject;
 
 import xyz.sluggard.transmatch.core.Engine;
+import xyz.sluggard.transmatch.entity.Order;
 
 public abstract class EngineEvent extends EventObject {
 	
@@ -11,7 +12,7 @@ public abstract class EngineEvent extends EventObject {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public EngineEvent(Engine engine) {
+	public EngineEvent(Engine<? extends Order> engine) {
 		super(engine);
 	}
 
@@ -20,7 +21,7 @@ public abstract class EngineEvent extends EventObject {
 	}
 	
 	public String getCurrencyPair() {
-		return ((Engine) source).getCurrencyPair();
+		return ((Engine<?>) source).getCurrencyPair();
 	}
 
 	@Override

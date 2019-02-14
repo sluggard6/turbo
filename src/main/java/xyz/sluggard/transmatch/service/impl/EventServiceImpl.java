@@ -13,7 +13,7 @@ import xyz.sluggard.transmatch.event.EngineListener;
 public class EventServiceImpl extends AbstractEventService{
 	
 	private ThreadLocal<Set<EngineListener>> localListeners;
-	
+
 	private ExecutorService executorService =  new ThreadPoolExecutor(4, 10,
             10L, TimeUnit.SECONDS,
             new LinkedBlockingQueue<Runnable>());
@@ -71,5 +71,8 @@ public class EventServiceImpl extends AbstractEventService{
 		executorService.shutdown();
 	}
 
+	public ExecutorService getExecutorService() {
+		return executorService;
+	}
 
 }

@@ -6,10 +6,10 @@ import java.util.List;
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.service.InitService;
 
-public class NoneInitServiceImpl implements InitService {
+public class NoneInitServiceImpl<O extends Order> implements InitService<O> {
 
 	@Override
-	public List<Order> initOrder() {
+	public List<O> initOrder() {
 		return Collections.emptyList();
 	}
 

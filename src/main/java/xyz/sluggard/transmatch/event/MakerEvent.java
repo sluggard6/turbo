@@ -14,7 +14,7 @@ public class MakerEvent extends EngineEvent {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public MakerEvent(Order order, Engine engine) {
+	public MakerEvent(Order order, Engine<? extends Order> engine) {
 		super(engine);
 		this.order = order;
 	}

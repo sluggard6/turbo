@@ -4,13 +4,13 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.EqualsAndHashCode;
 
 @Data
-@NoArgsConstructor
-public class Order implements Comparable<Order>{
+@EqualsAndHashCode
+public class Order implements Comparable<Order>, Cloneable{
 	
-	private String id;
+	private final String id;
 	
 	private BigDecimal price;
 	
@@ -22,22 +22,35 @@ public class Order implements Comparable<Order>{
 	
 	private Side side;
 	
-	private transient boolean booleanSide;
+	/**
+	 * true为ASK，false为BID
+	 */
+	private boolean ask;
 	
 	private Type type;
+
+	private boolean stop;
+	
+//	/**
+//	 * IOC(Immediate-or-Cancel)：指「立即成交否則取消」，投資人委託單送出後，允許部份單子成交，其他沒有滿足的單子則取消。當投資人掛出市價單時，系統會自動設定為「IOC」。
+//	 */
+//	private boolean ioc;
+//	
+//	/**
+//	 * FOK(Fill-or-Kill)：指「立即全部成交否則取消」，當投資人掛單的當下，只要全部的單子成交，沒有全部成交時則全部都取消。
+//	 */
+//	private boolean fok;
+	
+	private Category category;
 	
 	private String extend;
 	
 	public boolean isDone() {
 		return amount.compareTo(BigDecimal.ZERO) == 0;
 	}
-	
-	public boolean isAsk() {
-		return booleanSide;
-	}
-	
+
 	public boolean isBid() {
-		return !booleanSide;
+		return !ask;
 	}
 
 	public void negate() {
@@ -50,6 +63,21 @@ public class Order implements Comparable<Order>{
 	
 	public enum Type {
 		LIMIT,MARKET
+	}
+	
+	public enum Category {
+		/**
+		 * ROD（Rest of Day）：是「當日有效單」，也就是你掛出委託之後，當日一直到收盤，這張單子都是有效的。通常你掛限價單，系統會自動跳成 「ROD」。
+		 */
+		ROD,
+		/**
+		 * IOC(Immediate-or-Cancel)：指「立即成交否則取消」，投資人委託單送出後，允許部份單子成交，其他沒有滿足的單子則取消。當投資人掛出市價單時，系統會自動設定為「IOC」。
+		 */
+		IOC,
+		/**
+		 * FOK(Fill-or-Kill)：指「立即全部成交否則取消」，當投資人掛單的當下，只要全部的單子成交，沒有全部成交時則全部都取消。
+		 */
+		FOK;
 	}
 
 	@Override
@@ -70,7 +98,7 @@ public class Order implements Comparable<Order>{
 		if(isAsk()) {
 			return i;
 		}else {
-			return i*(-1);
+			return Math.negateExact(i);
 		}
 	}
 	
@@ -101,6 +129,28 @@ public class Order implements Comparable<Order>{
 		this.side = side;
 		this.type = type;
 		this.extend = extend;
-		this.booleanSide = side.equals(Side.ASK);
+		this.ask = side.equals(Side.ASK);
 	}
+
+	public boolean isMarket() {
+		return type.equals(Type.MARKET);
+	}
+
+	@Override
+	public Order clone() {
+		try {
+			return (Order) super.clone();
+		} catch (CloneNotSupportedException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public boolean isFok() {
+		return category.equals(Category.FOK);
+	}
+
+	public boolean isIoc() {
+		return category.equals(Category.IOC);
+	}
+
 }

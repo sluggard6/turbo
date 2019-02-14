@@ -1,10 +1,10 @@
 package xyz.sluggard.transmatch;
 
-import static org.junit.Assert.assertTrue;
+import static org.testng.Assert.assertTrue;
 
 import java.math.BigDecimal;
 
-import org.junit.Test;
+import org.testng.annotations.Test;
 
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
@@ -31,7 +31,7 @@ public class CompareTest {
 		assertTrue(order2.compareTo(order3)<0);
 	}
 	
-	@Test(expected = IllegalArgumentException.class)
+	@Test(expectedExceptions = IllegalArgumentException.class)
 	public void exceptionTest() {
 		Order order1 = new Order(new BigDecimal("100"), new BigDecimal(100), Side.ASK);
 		Order order2 = new Order(new BigDecimal("90"), new BigDecimal(100), Side.BID);
