@@ -14,7 +14,7 @@ public class OrderEvent extends EngineEvent {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public OrderEvent(Order order, Engine<? extends Order> engine) {
+	public OrderEvent(Order order, Engine engine) {
 		super(engine);
 		this.order = order;
 	}

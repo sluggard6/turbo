@@ -1,24 +1,29 @@
 package xyz.sluggard.transmatch.core;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
 import xyz.sluggard.transmatch.service.EventService;
 
-public interface Engine<O extends Order> {
+public interface Engine {
 	
 	String getCurrencyPair();
 	
-	boolean newOrder(O order);
+	boolean newOrder(Order order);
 
 	boolean cancelOrder(String orderId, Side side);
 
-	boolean cancelOrder(O order);
+	boolean cancelOrder(Order order);
+	
+	BigDecimal getSmallestAmount();
+	
+	void setSmallestAmount(BigDecimal smallestAmount);
 
-	Collection<O> getBidQueue();
+	Collection<Order> getBidQueue();
 
-	Collection<O> getAskQueue();
+	Collection<Order> getAskQueue();
 	
 	EventService getEventService();
 

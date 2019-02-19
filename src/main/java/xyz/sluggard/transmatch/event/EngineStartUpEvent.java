@@ -10,7 +10,7 @@ public class EngineStartUpEvent extends EngineEvent {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public EngineStartUpEvent(Engine<? extends Order> engine) {
+	public EngineStartUpEvent(Engine engine) {
 		super(engine);
 	}
 	

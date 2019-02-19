@@ -22,7 +22,7 @@ public class Test {
 				System.out.println(event);
 			}
 		});
-		Engine<Order> engine = new ExecutorEngine("BTC_USD", eventService);
+		Engine engine = new ExecutorEngine("BTC_USD", eventService);
 		engine.start();
 		
 		Order askOrder = new Order("1", new BigDecimal(100), new BigDecimal(10), Side.ASK);

@@ -14,9 +14,11 @@ import xyz.sluggard.transmatch.service.InitService;
 import xyz.sluggard.transmatch.service.impl.EventServiceImpl;
 import xyz.sluggard.transmatch.service.impl.NoneInitServiceImpl;
 
-public abstract class AbstractEngine<O extends Order> implements Engine<O>{
+public abstract class AbstractEngine implements Engine{
 	
 	private String currencyPair;
+
+	private BigDecimal smallestAmount;
 	
 	@Override
 	public String getCurrencyPair() {
@@ -24,14 +26,14 @@ public abstract class AbstractEngine<O extends Order> implements Engine<O>{
 	}
 	
 	public AbstractEngine(String currencyPair) {
-		this(currencyPair, new EventServiceImpl(), new NoneInitServiceImpl<O>());
+		this(currencyPair, new EventServiceImpl(), new NoneInitServiceImpl());
 	}
 	
 	public AbstractEngine(String currencyPair, EventService eventService) {
-		this(currencyPair, eventService, new NoneInitServiceImpl<O>());
+		this(currencyPair, eventService, new NoneInitServiceImpl());
 	}
 	
-	public AbstractEngine(String currencyPair, EventService eventService, InitService<O> initService) {
+	public AbstractEngine(String currencyPair, EventService eventService, InitService initService) {
 		if(currencyPair == null || currencyPair.trim().length() == 0) {
 			throw new NullPointerException("currencyPair can't be null");
 		}
@@ -42,7 +44,7 @@ public abstract class AbstractEngine<O extends Order> implements Engine<O>{
 
 	protected EventService eventService;
 	
-	protected InitService<O> initService;
+	protected InitService initService;
 	
 	@Override
 	public String toString() {
@@ -52,8 +54,8 @@ public abstract class AbstractEngine<O extends Order> implements Engine<O>{
 	@Override
 	public void start() {
 		eventService.publishEvent(new EngineStartUpEvent(this));
-		List<O> orders = initService.initOrder();
-		for(O order: orders) {
+		List<Order> orders = initService.initOrder();
+		for(Order order: orders) {
 			this.newOrder(order);
 		}
 	}
@@ -71,6 +73,16 @@ public abstract class AbstractEngine<O extends Order> implements Engine<O>{
 	protected final boolean overPrice(BigDecimal lastPrice, BigDecimal orderPrice, Order.Side side) {
 		return side.equals(Order.Side.ASK) ? lastPrice.compareTo(orderPrice) >= 0 : lastPrice.compareTo(orderPrice) <= 0;
 
+	}
+
+	@Override
+	public BigDecimal getSmallestAmount() {
+		return smallestAmount;
+	}
+
+	@Override
+	public void setSmallestAmount(BigDecimal smallestAmount) {
+		this.smallestAmount = smallestAmount;
 	}
 
 }

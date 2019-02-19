@@ -52,6 +52,10 @@ public class Order implements Comparable<Order>, Cloneable{
 	public boolean isBid() {
 		return !ask;
 	}
+	
+	public boolean isMarket() {
+		return type.equals(Type.MARKET);
+	}
 
 	public void negate() {
 		amount = amount.negate();
@@ -130,10 +134,6 @@ public class Order implements Comparable<Order>, Cloneable{
 		this.type = type;
 		this.extend = extend;
 		this.ask = side.equals(Side.ASK);
-	}
-
-	public boolean isMarket() {
-		return type.equals(Type.MARKET);
 	}
 
 	@Override

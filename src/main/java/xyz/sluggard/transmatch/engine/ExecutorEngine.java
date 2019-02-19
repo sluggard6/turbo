@@ -3,74 +3,59 @@ package xyz.sluggard.transmatch.engine;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.NavigableSet;
+import java.util.List;
 import java.util.Queue;
-import java.util.SortedSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import lombok.extern.slf4j.Slf4j;
-import xyz.sluggard.transmatch.core.SortedSetQueue;
+import xyz.sluggard.transmatch.core.Engine;
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
 import xyz.sluggard.transmatch.entity.Trade;
 import xyz.sluggard.transmatch.event.CancelEvent;
+import xyz.sluggard.transmatch.event.EngineDestoryEvent;
+import xyz.sluggard.transmatch.event.EngineStartUpEvent;
 import xyz.sluggard.transmatch.event.MakerEvent;
 import xyz.sluggard.transmatch.event.OrderEvent;
 import xyz.sluggard.transmatch.event.TradeEvent;
 import xyz.sluggard.transmatch.service.EventService;
 import xyz.sluggard.transmatch.service.InitService;
+import xyz.sluggard.transmatch.service.impl.EventServiceImpl;
+import xyz.sluggard.transmatch.service.impl.NoneInitServiceImpl;
 
 @Slf4j
-public class ExecutorEngine extends AbstractEngine<Order>{
-
-	private final SortedSetQueue<Order> bidQueue = new SortedSetQueue<>(new SideComparator());
-
-	private final SortedSetQueue<Order> askQueue = new SortedSetQueue<>(new SideComparator());
+public class ExecutorEngine extends AbstractEngine implements Engine{
 	
-	private static class SideComparator implements Comparator<Order> {
-
-		@Override
-		public int compare(Order o1, Order o2) {
-			if(o1.isAsk()^o2.isAsk()) {
-				if(o1.isAsk()) {
-					if(canMatch(o2, o1)) {
-						return 1;
-					}else {
-						return -1;
-					}
-				}else {
-					if(canMatch(o1, o2)) {
-						return 1;
-					}else {
-						return -1;
-					}
-				}
-			}else {
-				return o1.compareTo(o2);
-			}
-		}
-	}
+	static PriorityBlockingQueue<Order> bidQueue = new PriorityBlockingQueue<>();
 	
-	private boolean fokCheck;
+	static PriorityBlockingQueue<Order> askQueue = new PriorityBlockingQueue<>();
+	
+	private String currencyPair;
 	
 	public ExecutorEngine(String currencyPair) {
-		super(currencyPair);
+		this(currencyPair, new EventServiceImpl(), new NoneInitServiceImpl());
 	}
 	
 	public ExecutorEngine(String currencyPair, EventService eventService) {
-		super(currencyPair, eventService);
+		this(currencyPair, eventService, new NoneInitServiceImpl());
 	}
 	
-	public ExecutorEngine(String currencyPair, EventService eventService, InitService<Order> initService) {
+	public ExecutorEngine(String currencyPair, EventService eventService, InitService initService) {
+//		if(currencyPair == null || currencyPair.trim().length() == 0) {
+//			throw new NullPointerException("currencyPair can't be null");
+//		}
+//		this.currencyPair = currencyPair;
+//		this.eventService = eventService;
+//		this.initService = initService;
 		super(currencyPair, eventService, initService);
 	}
 	
@@ -79,6 +64,10 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 	
 	private static final long TIME_OUT = 5000;
 
+	private EventService eventService;
+	
+	private InitService initService;
+	
 	@Override
 	@PostConstruct
 	public void start() {
@@ -86,7 +75,11 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 			if (executorService != null && !executorService.isShutdown())
 				throw new IllegalStateException();
 			executorService = Executors.newSingleThreadExecutor();
-			super.start();
+			eventService.publishEvent(new EngineStartUpEvent(this));
+			List<Order> orders = initService.initOrder();
+			for(Order order: orders) {
+				newOrder(order);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
@@ -97,7 +90,7 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 	@PreDestroy
 	public void stop() {
 		executorService.shutdown();
-		super.stop();
+		eventService.publishEvent(new EngineDestoryEvent(this));
 	}
 	
 	@Override
@@ -106,25 +99,21 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 	}
 
 	public void setEventService(EventService eventService) {
-		checkBeforeStart();
 		this.eventService = eventService;
 	}
 
-
-	public void setInitService(InitService<Order> initService) {
+	public void setInitService(InitService initService) {
 		this.initService = initService;
 	}
 
-	private boolean checkBeforeStart() {
-		return !executorService.isShutdown();
+	@Override
+	public String getCurrencyPair() {
+		return currencyPair;
 	}
-
 
 	@Override
 	public boolean newOrder(Order order) {
-		if(log.isDebugEnabled()) {
-			log.debug(order.toString());
-		}
+		log.info(order.toString());
 		executorService.submit(new Command(order));
 		return true;
 	}
@@ -164,34 +153,9 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 		return Collections.unmodifiableCollection(bidQueue);
 	}
 	
-	private void addSameQueue(Order order) {
-		eventService.publishEvent(new MakerEvent(order.clone(), ExecutorEngine.this));
-		getSameQueue(order.isAsk()).add(order);
-		
-	}
-
-	private Queue<Order> getOppositeQueue(boolean booleanSide) {
-		if(booleanSide) {
-			return askQueue;
-		}else {
-			return bidQueue;
-		}
-	}
-	
-	private NavigableSet<Order> getOppositeSet(boolean booleanSide) {
-		if(booleanSide) {
-			return askQueue;
-		}else {
-			return bidQueue;
-		}
-	}
-	
-	private Queue<Order> getSameQueue(boolean booleanSide) {
-		if(booleanSide) {
-			return bidQueue;
-		}else {
-			return askQueue;
-		}
+	@Override
+	public String toString() {
+		return "ExecutorEngine [currencyPair=" + currencyPair + "]";
 	}
 
 	private class Command implements Callable<Boolean> {
@@ -233,7 +197,6 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 						return cancelOrderIter(bidQueue, orderId) != null;
 					}
 				}else {
-//					newOrder(order);
 					newOrder(order);
 					return true;
 				}
@@ -242,55 +205,70 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 				return false;
 			}
 		}
-		
-		private void newOrder(Order order) {
-			eventService.publishEvent(new OrderEvent(order.clone(), ExecutorEngine.this));
-			if(order.isFok() && !fokCheck) {
-				SortedSet<Order> set = getOppositeSet(order.isAsk()).headSet(order);
-				BigDecimal sum = set.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-				if(sum.compareTo(order.getAmount()) >= 0) {
-					fokCheck = true;
-				}else {
-					eventService.publishEvent(new CancelEvent(order, ExecutorEngine.this));
-					return;
-				}
-//				makeFokStack(order);
-			}
-			Order op = getOppositeQueue(order.isAsk()).peek();
-			if(op == null) {
-				addSameQueue(order);
+
+		private void newBid(Order bidOrder) {
+			Order askOrder = askQueue.peek();
+			if(askOrder == null) {
+				addBid(bidOrder);
 				return;
 			}
-			if(!noneMatch(order, op)) {
-				if(order.isIoc()) {
-					eventService.publishEvent(new CancelEvent(order, ExecutorEngine.this));
-				}else {
-					addSameQueue(order);
-				}
+			if(!match(bidOrder, askOrder)) {
+				addBid(bidOrder);
 				return;
 			}else {
-				if(op.isDone()) {
-					getOppositeQueue(order.isAsk()).poll();
+				if(askOrder.isDone()) {
+					askQueue.poll();
 				}
-				if(!order.isDone()) {
-					newOrder(order);
-				}else {
-					if(order.isFok()) {
-						fokCheck = false;
-					}
+				if(!bidOrder.isDone()) {
+					newBid(bidOrder);
+				}
+			}
+		}
+
+		private void newAsk(Order askOrder) {
+			Order bidOrder = bidQueue.peek();
+			if(bidOrder == null) {
+				addAsk(askOrder);
+				return;
+			}
+			if(!match(bidOrder, askOrder)) {
+				addAsk(askOrder);
+				return;
+			}else {
+				if(bidOrder.isDone()) {
+					bidQueue.poll();
+				}
+				if(!askOrder.isDone()) {
+					newAsk(askOrder);
 				}
 			}
 		}
 		
-
+		private void addAsk(Order askOrder) {
+			eventService.publishEvent(new MakerEvent(askOrder, ExecutorEngine.this));
+			askQueue.add(askOrder);
+		}
+		
+		private void addBid(Order bidOrder) {
+			eventService.publishEvent(new MakerEvent(bidOrder, ExecutorEngine.this));
+			bidQueue.add(bidOrder);
+		}
+		
+		private final boolean preMatch(Order bidOrder, Order askOrder) {
+			if(bidOrder.isMarket() || askOrder.isMarket()) {
+				return true;
+			}else {
+				return bidOrder.getPrice().compareTo(askOrder.getPrice()) >= 0;
+			}
+			
+		}
 
 		private final boolean match(Order bidOrder, Order askOrder) {
-			if(canMatch(bidOrder, askOrder)) {
+			if(preMatch(bidOrder, askOrder)) {
 				BigDecimal min = bidOrder.getAmount().min(askOrder.getAmount());
 				bidOrder.setAmount(bidOrder.getAmount().subtract(min));
 				askOrder.setAmount(askOrder.getAmount().subtract(min));
 				MatchPrice price = getPrice(bidOrder, askOrder);
-//				ExecutorEngine.this.lastPrice = price.price;
 				Trade trade = new Trade(bidOrder.getId(), askOrder.getId(), price.price, min, price.maker.getId(), price.taker.getId());
 				eventService.publishEvent(new TradeEvent(trade, ExecutorEngine.this));
 				return true;
@@ -298,18 +276,30 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 			return false;
 		}
 		
-		private final boolean noneMatch(Order o1, Order o2) {
-			if(o1.isAsk()^o2.isAsk()) {
-				if(o1.isAsk()) {
-					return match(o2,o1);
-				}else {
-					return match(o1,o2);
-				}
-			}else {
-				throw new IllegalArgumentException("same side order can't make trade");
+		private void newOrder(Order order) {
+			eventService.publishEvent(new OrderEvent(order, ExecutorEngine.this));
+			switch (order.getSide()) {
+			case BID:
+				newBid(order);
+				break;
+			case ASK:
+				newAsk(order);
+				break;
+			default:
+				throw new IllegalArgumentException("unknow trade type : " + order.getSide());
 			}
 		}
 		
+		/**
+		 * @deprecated "不推荐使用，取消订单尽量提前确实是买单还是卖单"
+		 * @param orderId
+		 * @return
+		 */
+		@SuppressWarnings("unused")
+		@Deprecated()
+		private boolean cancelOrder(String orderId) {
+				return (cancelOrderIter(bidQueue, orderId) != null) || (cancelOrderIter(askQueue, orderId) != null);
+		}
 		
 		private Order cancelOrderIter(Queue<Order> queue, String orderId) {
 			Iterator<Order> iter = queue.iterator();
@@ -318,7 +308,7 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 				if(order.getId().equals(orderId)) {
 					iter.remove();
 					order.negate();
-					eventService.publishEvent(new CancelEvent(order.clone(), ExecutorEngine.this));
+					eventService.publishEvent(new CancelEvent(order, ExecutorEngine.this));
 					return order;
 				}
 			}
@@ -328,7 +318,7 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 	}
 	
 	private static final MatchPrice getPrice(Order o1, Order o2) {
-		if(o1.getNanotime() < o2.getNanotime()) {
+		if(o1.getTimestamp() < o2.getTimestamp()) {
 			return new MatchPrice(o1, o2);
 		}else {
 			return new MatchPrice(o2, o1);
@@ -346,7 +336,7 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 			super();
 			this.maker = maker;
 			this.taker = taker;
-			this.price = maker.isMarket() ? maker.getPrice() : taker.getPrice();
+			this.price = maker.getPrice();
 		}
 		
 	}
