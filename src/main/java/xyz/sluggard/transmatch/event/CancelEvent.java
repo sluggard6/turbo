@@ -13,7 +13,7 @@ public class CancelEvent extends EngineEvent {
 	 */
 	private static final long serialVersionUID = 1L;
 	
-	public CancelEvent(Order order, Engine<? extends Order> source) {
+	public CancelEvent(Order order, Engine source) {
 		super(source);
 		this.order = order;
 	}

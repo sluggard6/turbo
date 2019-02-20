@@ -2,7 +2,7 @@ package xyz.sluggard.transmatch.core;
 
 import xyz.sluggard.transmatch.entity.Order;
 
-public interface PreMatchable<T extends Order> extends Engine<T> {
+public interface PreMatchable extends Engine {
 	
-	String preMatch(T order);
+	String preMatch(Order order);
 }

@@ -30,7 +30,7 @@ import xyz.sluggard.transmatch.service.EventService;
 import xyz.sluggard.transmatch.service.InitService;
 
 @Slf4j
-public class ExecutorEngine extends AbstractEngine<Order>{
+public class ExecutorEngine extends AbstractEngine{
 
 	private final SortedSetQueue<Order> bidQueue = new SortedSetQueue<>(new SideComparator());
 
@@ -70,7 +70,7 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 		super(currencyPair, eventService);
 	}
 	
-	public ExecutorEngine(String currencyPair, EventService eventService, InitService<Order> initService) {
+	public ExecutorEngine(String currencyPair, EventService eventService, InitService initService) {
 		super(currencyPair, eventService, initService);
 	}
 	
@@ -111,7 +111,7 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 	}
 
 
-	public void setInitService(InitService<Order> initService) {
+	public void setInitService(InitService initService) {
 		this.initService = initService;
 	}
 

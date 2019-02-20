@@ -13,7 +13,7 @@ import xyz.sluggard.transmatch.core.PreMatchable;
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.service.EventService;
 
-public class PriorityEngine extends AbstractEngine<Order> implements PreMatchable<Order> {
+public class PriorityEngine extends AbstractEngine implements PreMatchable {
 
     private ExecutorService executorService;
 
