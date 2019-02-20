@@ -15,8 +15,10 @@ import org.testng.annotations.Test;
 
 import xyz.sluggard.transmatch.engine.ExecutorEngine;
 import xyz.sluggard.transmatch.entity.Order;
+import xyz.sluggard.transmatch.entity.Order.Category;
 import xyz.sluggard.transmatch.entity.Order.Side;
 import xyz.sluggard.transmatch.entity.Trade;
+import xyz.sluggard.transmatch.event.CancelEvent;
 import xyz.sluggard.transmatch.event.EngineEvent;
 import xyz.sluggard.transmatch.event.EngineListener;
 import xyz.sluggard.transmatch.event.MakerEvent;
@@ -116,6 +118,31 @@ public class MatchTest {
 			if(event instanceof MakerEvent) {
 				Order order = ((MakerEvent) event).getOrder();
 				assertTrue((order.getId().equals("1") || order.getId().equals("2")));
+			}
+		}
+	}
+	
+	@Test
+	public void fokMatch() throws Exception {
+		Order order1 = new Order("1", BigDecimal.ONE, BigDecimal.ONE, Side.ASK);
+		Order order2 = new Order("2", BigDecimal.valueOf(2), BigDecimal.ONE, Side.ASK);
+		Order order3 = new Order("3", BigDecimal.valueOf(3), BigDecimal.ONE, Side.ASK);
+		Order order4 = new Order("4", BigDecimal.valueOf(4), BigDecimal.ONE, Side.ASK);
+		Order order5 = new Order("5", BigDecimal.valueOf(3), BigDecimal.valueOf(5), Side.BID, Category.FOK);
+		Order order6 = new Order("6", BigDecimal.valueOf(3), BigDecimal.valueOf(3), Side.BID, Category.FOK);
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.newOrder(order3);
+		engine.newOrder(order4);
+		engine.newOrder(order5);
+		engine.newOrder(order6);
+		engine.stop();
+		Thread.sleep(1000);
+		System.out.println("---------------fok match------------------");
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				assertEquals("5", ((CancelEvent) event).getOrder().getId());
 			}
 		}
 	}

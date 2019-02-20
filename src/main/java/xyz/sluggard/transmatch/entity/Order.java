@@ -103,22 +103,26 @@ public class Order implements Comparable<Order>, Cloneable{
 	}
 	
 	public Order(BigDecimal amount, Side side) {
-		this(null, null, amount, side, Type.MARKET, null);
+		this(null, null, amount, side, Type.MARKET, null, null);
 	}
 	
 	public Order(BigDecimal price, BigDecimal amount, Side side) {
-		this(null, price, amount, side, null);
+		this(null, price, amount, side);
 	}
 	
 	public Order(String id,BigDecimal price, BigDecimal amount, Side side) {
-		this(id, price, amount, side, Type.LIMIT, null);
+		this(id, price, amount, side, Type.LIMIT, null, null);
+	}
+	
+	public Order(String id,BigDecimal price, BigDecimal amount, Side side, Category category) {
+		this(id, price, amount, side, Type.LIMIT, null, category);
 	}
 	
 	public Order(String id,BigDecimal price, BigDecimal amount, Side side, String extend) {
-		this(null, price, amount, side, Type.LIMIT, extend);
+		this(null, price, amount, side, Type.LIMIT, extend, null);
 	}
 	
-	public Order(String id,BigDecimal price, BigDecimal amount, Side side, Type type, String extend) {
+	public Order(String id,BigDecimal price, BigDecimal amount, Side side, Type type, String extend, Category category) {
 		if(id == null) {
 			this.id = UUID.randomUUID().toString().replaceAll("-", "");
 		}else {
@@ -130,6 +134,12 @@ public class Order implements Comparable<Order>, Cloneable{
 		this.type = type;
 		this.extend = extend;
 		this.ask = side.equals(Side.ASK);
+		if(category == null) {
+			this.category = Category.ROD;
+		}else {
+			this.category = category;
+		}
+		
 	}
 
 	public boolean isMarket() {

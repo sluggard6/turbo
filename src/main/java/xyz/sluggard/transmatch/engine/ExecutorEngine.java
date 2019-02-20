@@ -43,15 +43,15 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 			if(o1.isAsk()^o2.isAsk()) {
 				if(o1.isAsk()) {
 					if(canMatch(o2, o1)) {
-						return 1;
-					}else {
 						return -1;
+					}else {
+						return 1;
 					}
 				}else {
 					if(canMatch(o1, o2)) {
-						return 1;
-					}else {
 						return -1;
+					}else {
+						return 1;
 					}
 				}
 			}else {
@@ -233,7 +233,7 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 						return cancelOrderIter(bidQueue, orderId) != null;
 					}
 				}else {
-//					newOrder(order);
+					eventService.publishEvent(new OrderEvent(order.clone(), ExecutorEngine.this));
 					newOrder(order);
 					return true;
 				}
@@ -244,7 +244,6 @@ public class ExecutorEngine extends AbstractEngine<Order>{
 		}
 		
 		private void newOrder(Order order) {
-			eventService.publishEvent(new OrderEvent(order.clone(), ExecutorEngine.this));
 			if(order.isFok() && !fokCheck) {
 				SortedSet<Order> set = getOppositeSet(order.isAsk()).headSet(order);
 				BigDecimal sum = set.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
