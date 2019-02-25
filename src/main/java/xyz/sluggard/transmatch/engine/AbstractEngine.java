@@ -1,6 +1,7 @@
 package xyz.sluggard.transmatch.engine;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 import javax.annotation.PreDestroy;
@@ -18,7 +19,7 @@ public abstract class AbstractEngine implements Engine{
 	
 	private String currencyPair;
 
-	private BigDecimal smallestAmount;
+	private int quotePrecision;
 	
 	@Override
 	public String getCurrencyPair() {
@@ -67,22 +68,41 @@ public abstract class AbstractEngine implements Engine{
 	}
 
 	protected static final boolean canMatch(Order bidOrder, Order askOrder) {
-		return bidOrder.getPrice().compareTo(askOrder.getPrice()) >= 0;
+		if(bidOrder.isMarket() || askOrder.isMarket()) {
+			return true;
+		}else {
+			return bidOrder.getPrice().compareTo(askOrder.getPrice()) >= 0;
+		}
 	}
-
+	
+	protected BigDecimal getAmount(Order order, BigDecimal price) {
+		if(order.isMarket() && order.isBid()) {
+			order.setPrice(price);
+			return order.getFands().divide(price, quotePrecision, RoundingMode.DOWN);
+		}else {
+			return order.getAmount();
+		}
+	}
+	
+	protected BigDecimal getAmount(Order bidOrder, Order askOrder) {
+		if(bidOrder.isMarket()) {
+			return getAmount(bidOrder, askOrder.getPrice()).min(askOrder.getAmount());
+		}else {
+			return bidOrder.getAmount().min(askOrder.getAmount());
+		}
+	}
+	
+	
 	protected final boolean overPrice(BigDecimal lastPrice, BigDecimal orderPrice, Order.Side side) {
 		return side.equals(Order.Side.ASK) ? lastPrice.compareTo(orderPrice) >= 0 : lastPrice.compareTo(orderPrice) <= 0;
-
 	}
 
-	@Override
-	public BigDecimal getSmallestAmount() {
-		return smallestAmount;
+	public int getQuotePrecision() {
+		return quotePrecision;
 	}
 
-	@Override
-	public void setSmallestAmount(BigDecimal smallestAmount) {
-		this.smallestAmount = smallestAmount;
+	public void setQuotePrecision(int quotePrecision) {
+		this.quotePrecision = quotePrecision;
 	}
 
 }

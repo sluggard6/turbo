@@ -16,6 +16,8 @@ public class Order implements Comparable<Order>, Cloneable{
 	
 	private BigDecimal amount;
 	
+	private BigDecimal fands;
+	
 	private long nanotime = System.nanoTime();
 	
 	private long timestamp = System.currentTimeMillis();
@@ -30,6 +32,8 @@ public class Order implements Comparable<Order>, Cloneable{
 	private Type type;
 
 	private boolean stop;
+	
+	private boolean marketDone;
 	
 //	/**
 //	 * IOC(Immediate-or-Cancel)：指「立即成交否則取消」，投資人委託單送出後，允許部份單子成交，其他沒有滿足的單子則取消。當投資人掛出市價單時，系統會自動設定為「IOC」。
@@ -46,7 +50,11 @@ public class Order implements Comparable<Order>, Cloneable{
 	private String extend;
 	
 	public boolean isDone() {
-		return amount.compareTo(BigDecimal.ZERO) == 0;
+		if(isMarket() && isBid()) {
+			return marketDone;
+		}else {
+			return amount.compareTo(BigDecimal.ZERO) == 0;
+		}
 	}
 
 	public boolean isBid() {
@@ -161,6 +169,14 @@ public class Order implements Comparable<Order>, Cloneable{
 
 	public boolean isIoc() {
 		return category.equals(Category.IOC);
+	}
+	
+	public void subtractAmount(BigDecimal amount, BigDecimal price) {
+		if(isMarket() && isBid()) {
+			this.fands = this.fands.subtract(amount.multiply(price));
+		}else {
+			this.amount = this.amount.subtract(amount);
+		}
 	}
 
 }

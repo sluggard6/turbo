@@ -1,6 +1,5 @@
 package xyz.sluggard.transmatch.core;
 
-import java.math.BigDecimal;
 import java.util.Collection;
 
 import xyz.sluggard.transmatch.entity.Order;
@@ -17,9 +16,9 @@ public interface Engine {
 
 	boolean cancelOrder(Order order);
 	
-	BigDecimal getSmallestAmount();
+	int getQuotePrecision();
 	
-	void setSmallestAmount(BigDecimal smallestAmount);
+	void setQuotePrecision(int quotePrecision);
 
 	Collection<Order> getBidQueue();
 

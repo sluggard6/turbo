@@ -1,5 +1,10 @@
 package xyz.sluggard.transmatch;
 
+import static org.testng.Assert.assertEquals;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 import org.testng.annotations.Test;
 
 public class BigDecimalTest {
@@ -40,6 +45,13 @@ public class BigDecimalTest {
 				b = ~a;
 				System.out.println("a: "+a+" b: "+b);
 
+	}
+	
+	@Test
+	public void divideTest() {
+		BigDecimal b1 = new BigDecimal("0.000000002");
+		BigDecimal b2 = new BigDecimal("0.01");
+		assertEquals(0, b1.divide(b2, 4, RoundingMode.DOWN).compareTo(BigDecimal.ZERO));
 	}
 
 }

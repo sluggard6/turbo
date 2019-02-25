@@ -253,7 +253,6 @@ public class ExecutorEngine extends AbstractEngine{
 					eventService.publishEvent(new CancelEvent(order, ExecutorEngine.this));
 					return;
 				}
-//				makeFokStack(order);
 			}
 			Order op = getOppositeQueue(order.isAsk()).peek();
 			if(op == null) {
@@ -277,17 +276,34 @@ public class ExecutorEngine extends AbstractEngine{
 					if(order.isFok()) {
 						fokCheck = false;
 					}
+					if(order.isMarket() && order.isBid() && order.getFands().compareTo(BigDecimal.ZERO) > 0) {
+						eventService.publishEvent(new CancelEvent(order, ExecutorEngine.this));
+					}
 				}
 			}
 		}
 		
 
-
+		/**
+		 * 成交方法
+		 * @param bidOrder 买单
+		 * @param askOrder 卖单
+		 * @return
+		 */
 		private final boolean match(Order bidOrder, Order askOrder) {
 			if(canMatch(bidOrder, askOrder)) {
-				BigDecimal min = bidOrder.getAmount().min(askOrder.getAmount());
-				bidOrder.setAmount(bidOrder.getAmount().subtract(min));
-				askOrder.setAmount(askOrder.getAmount().subtract(min));
+//				BigDecimal min = bidOrder.getAmount().min(askOrder.getAmount());
+				BigDecimal min = getAmount(bidOrder, askOrder);
+				if(min.compareTo(BigDecimal.ZERO) == 0) {
+					if(bidOrder.isMarket()) {
+						bidOrder.setMarketDone(true);
+					}
+					return false;
+				}
+//				bidOrder.setAmount(bidOrder.getAmount().subtract(min));
+//				askOrder.setAmount(askOrder.getAmount().subtract(min));
+				bidOrder.subtractAmount(min, askOrder.getPrice());
+				askOrder.subtractAmount(min, bidOrder.getPrice());
 				MatchPrice price = getPrice(bidOrder, askOrder);
 //				ExecutorEngine.this.lastPrice = price.price;
 				Trade trade = new Trade(bidOrder.getId(), askOrder.getId(), price.price, min, price.maker.getId(), price.taker.getId());
