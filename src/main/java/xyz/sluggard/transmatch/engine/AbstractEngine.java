@@ -78,7 +78,7 @@ public abstract class AbstractEngine implements Engine{
 	protected BigDecimal getAmount(Order order, BigDecimal price) {
 		if(order.isMarket() && order.isBid()) {
 			order.setPrice(price);
-			return order.getFands().divide(price, quotePrecision, RoundingMode.DOWN);
+			return order.getFunds().divide(price, quotePrecision, RoundingMode.DOWN);
 		}else {
 			return order.getAmount();
 		}

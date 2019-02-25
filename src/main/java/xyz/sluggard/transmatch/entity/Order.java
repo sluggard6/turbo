@@ -16,7 +16,7 @@ public class Order implements Comparable<Order>, Cloneable{
 	
 	private BigDecimal amount;
 	
-	private BigDecimal fands;
+	private BigDecimal funds;
 	
 	private long nanotime = System.nanoTime();
 	
@@ -173,7 +173,7 @@ public class Order implements Comparable<Order>, Cloneable{
 	
 	public void subtractAmount(BigDecimal amount, BigDecimal price) {
 		if(isMarket() && isBid()) {
-			this.fands = this.fands.subtract(amount.multiply(price));
+			this.funds = this.funds.subtract(amount.multiply(price));
 		}else {
 			this.amount = this.amount.subtract(amount);
 		}

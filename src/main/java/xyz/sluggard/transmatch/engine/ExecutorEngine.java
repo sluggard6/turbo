@@ -276,7 +276,7 @@ public class ExecutorEngine extends AbstractEngine{
 					if(order.isFok()) {
 						fokCheck = false;
 					}
-					if(order.isMarket() && order.isBid() && order.getFands().compareTo(BigDecimal.ZERO) > 0) {
+					if(order.isMarket() && order.isBid() && order.getFunds().compareTo(BigDecimal.ZERO) > 0) {
 						eventService.publishEvent(new CancelEvent(order, ExecutorEngine.this));
 					}
 				}
