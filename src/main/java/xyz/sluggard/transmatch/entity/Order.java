@@ -4,13 +4,11 @@ import java.math.BigDecimal;
 import java.util.UUID;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode
 public class Order implements Comparable<Order>, Cloneable{
 	
-	private final String id;
+	private String id;
 	
 	private BigDecimal price;
 	
@@ -34,16 +32,6 @@ public class Order implements Comparable<Order>, Cloneable{
 	private boolean stop;
 	
 	private boolean marketDone;
-	
-//	/**
-//	 * IOC(Immediate-or-Cancel)：指「立即成交否則取消」，投資人委託單送出後，允許部份單子成交，其他沒有滿足的單子則取消。當投資人掛出市價單時，系統會自動設定為「IOC」。
-//	 */
-//	private boolean ioc;
-//	
-//	/**
-//	 * FOK(Fill-or-Kill)：指「立即全部成交否則取消」，當投資人掛單的當下，只要全部的單子成交，沒有全部成交時則全部都取消。
-//	 */
-//	private boolean fok;
 	
 	private Category category;
 	
@@ -114,9 +102,48 @@ public class Order implements Comparable<Order>, Cloneable{
 		}
 	}
 	
-	public Order(BigDecimal amount, Side side) {
-		this(null, null, amount, side, Type.MARKET, null, null);
+//	public static OrderBuilder builder() {
+//		return new OrderBuilder() {
+//			
+//			private Order value;
+//			
+//			private void checkOrder() {
+//				if(value == null) {
+//					this.value = new Order();
+//				}
+//			}
+//			
+//			@Override
+//			public OrderBuilder marketOrder() {
+//				checkOrder();
+//				value.setType(Type.MARKET);
+//				return null;
+//			}
+//			
+//			@Override
+//			public Order build() {
+//				try {
+//					checkOrder();
+//					return value;
+//				}finally {
+//					value = null;
+//				}
+//			}
+//		};
+//	}
+	
+	
+	public Order(String id, Type type, Side side) {
+		this(id, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, side, type, null, null);
 	}
+	
+	public Order(BigDecimal amount, BigDecimal funds, Type type, Side side) {
+		this(null, BigDecimal.ZERO, amount, funds, side, type, null, null);
+	}
+	
+//	public Order(BigDecimal amount, Side side) {
+//		this(null, null, amount, side, Type.MARKET, null, null);
+//	}
 	
 	public Order(BigDecimal price, BigDecimal amount, Side side) {
 		this(null, price, amount, side);
@@ -135,6 +162,11 @@ public class Order implements Comparable<Order>, Cloneable{
 	}
 	
 	public Order(String id,BigDecimal price, BigDecimal amount, Side side, Type type, String extend, Category category) {
+		this(id, price, amount, null, side, Type.LIMIT,  category, extend);
+	}
+	
+	private Order(String id, BigDecimal price, BigDecimal amount, BigDecimal funds,
+			Side side, Type type, Category category, String extend) {
 		if(id == null) {
 			this.id = UUID.randomUUID().toString().replaceAll("-", "");
 		}else {
@@ -142,16 +174,16 @@ public class Order implements Comparable<Order>, Cloneable{
 		}
 		this.price = price;
 		this.amount = amount;
+		this.funds = funds;
 		this.side = side;
-		this.type = type;
-		this.extend = extend;
 		this.ask = side.equals(Side.ASK);
+		this.type = type;
 		if(category == null) {
 			this.category = Category.ROD;
 		}else {
 			this.category = category;
 		}
-		
+		this.extend = extend;
 	}
 
 	@Override

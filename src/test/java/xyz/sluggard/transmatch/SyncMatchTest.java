@@ -13,10 +13,11 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import xyz.sluggard.transmatch.engine.ExecutorEngine;
+import xyz.sluggard.transmatch.engine.SyncEngine;
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Category;
 import xyz.sluggard.transmatch.entity.Order.Side;
+import xyz.sluggard.transmatch.entity.Order.Type;
 import xyz.sluggard.transmatch.entity.Trade;
 import xyz.sluggard.transmatch.event.CancelEvent;
 import xyz.sluggard.transmatch.event.EngineEvent;
@@ -26,9 +27,9 @@ import xyz.sluggard.transmatch.event.OrderEvent;
 import xyz.sluggard.transmatch.event.TradeEvent;
 import xyz.sluggard.transmatch.service.impl.AbstractEventService;
 
-public class MatchTest {
+public class SyncMatchTest {
 	
-	private ExecutorEngine engine;
+	private SyncEngine engine;
 	
 	private List<EngineEvent> events = new CopyOnWriteArrayList<EngineEvent>();
 	
@@ -38,7 +39,7 @@ public class MatchTest {
 	public void init() {
 //		engine = new ExecutorEngine("BTC_USD", new DispenseEventServiceImpl());
 //		engine = new ExecutorEngine("BTC_USD", eventService);
-		engine = new ExecutorEngine("BTC_USD", new AbstractEventService() {
+		engine = new SyncEngine("BTC_USD", new AbstractEventService() {
 		});
 //		engine = new ExecutorEngine("BTC_USD");
 		engine.getEventService().addListener(new EngineListener() {
@@ -63,7 +64,6 @@ public class MatchTest {
 		engine.newOrder(order1);
 		engine.newOrder(order2);
 		engine.stop();
-		Thread.sleep(1000);
 		System.out.println("---------------one match------------------");
 		for(EngineEvent event : events) {
 			System.out.println(event);
@@ -93,7 +93,6 @@ public class MatchTest {
 		engine.newOrder(order2);
 		engine.newOrder(order3);
 		engine.stop();
-		Thread.sleep(1000);
 		System.out.println("---------------two match------------------");
 		for(EngineEvent event : events) {
 			System.out.println(event);
@@ -137,7 +136,6 @@ public class MatchTest {
 		engine.newOrder(order5);
 		engine.newOrder(order6);
 		engine.stop();
-		Thread.sleep(1000);
 		System.out.println("---------------fok match------------------");
 		for(EngineEvent event : events) {
 			System.out.println(event);
@@ -149,7 +147,17 @@ public class MatchTest {
 	
 	@Test
 	public void marketMatch() throws Exception {
-		
+		Order order1 = new Order("1", Type.MARKET, Side.ASK);
+		order1.setAmount(BigDecimal.valueOf(1));
+		engine.newOrder(order1);
+		engine.stop();
+		System.out.println("---------------market match------------------");
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				assertEquals("1", ((CancelEvent) event).getOrder().getId());
+			}
+		}
 	}
 
 }

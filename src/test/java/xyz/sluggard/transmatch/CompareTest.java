@@ -8,6 +8,7 @@ import org.testng.annotations.Test;
 
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
+import xyz.sluggard.transmatch.entity.Order.Type;
 
 public class CompareTest {
 	
@@ -40,8 +41,10 @@ public class CompareTest {
 	
 	@Test
 	public void marketCompile() {
-		Order order1 = new Order(new BigDecimal(100), Side.ASK);
-		Order order2 = new Order(new BigDecimal(100), Side.ASK);
+		Order order1 = new Order(BigDecimal.ZERO, new BigDecimal(100), Type.MARKET, Side.ASK);
+		Order order2 = new Order(BigDecimal.ZERO, new BigDecimal(100), Type.MARKET, Side.ASK);
+//		Order order1 = new Order(new BigDecimal(100), Side.ASK);
+//		Order order2 = new Order(new BigDecimal(100), Side.ASK);
 		assertTrue(order1.compareTo(order2)<0);
 	}
 	
@@ -49,7 +52,8 @@ public class CompareTest {
 	@Test
 	public void marketLimitCompile() {
 		Order order1 = new Order(new BigDecimal(100), new BigDecimal(100), Side.ASK);
-		Order order2 = new Order(new BigDecimal(100), Side.ASK);
+		Order order2 = new Order(BigDecimal.ZERO, new BigDecimal(100), Type.MARKET, Side.ASK);
+//		Order order2 = new Order(new BigDecimal(100), Side.ASK);
 		assertTrue(order1.compareTo(order2)>0);
 	}
 }

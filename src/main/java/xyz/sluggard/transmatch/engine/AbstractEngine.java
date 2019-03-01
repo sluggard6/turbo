@@ -2,8 +2,10 @@ package xyz.sluggard.transmatch.engine;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import xyz.sluggard.transmatch.core.Engine;
@@ -20,6 +22,30 @@ public abstract class AbstractEngine implements Engine{
 	private String currencyPair;
 
 	private int quotePrecision;
+	
+	protected static class SideComparator implements Comparator<Order> {
+
+		@Override
+		public int compare(Order o1, Order o2) {
+			if(o1.isAsk()^o2.isAsk()) {
+				if(o1.isAsk()) {
+					if(canMatch(o2, o1)) {
+						return -1;
+					}else {
+						return 1;
+					}
+				}else {
+					if(canMatch(o1, o2)) {
+						return -1;
+					}else {
+						return 1;
+					}
+				}
+			}else {
+				return o1.compareTo(o2);
+			}
+		}
+	}
 	
 	@Override
 	public String getCurrencyPair() {
@@ -53,6 +79,7 @@ public abstract class AbstractEngine implements Engine{
 	}
 	
 	@Override
+	@PostConstruct
 	public void start() {
 		eventService.publishEvent(new EngineStartUpEvent(this));
 		List<Order> orders = initService.initOrder();
