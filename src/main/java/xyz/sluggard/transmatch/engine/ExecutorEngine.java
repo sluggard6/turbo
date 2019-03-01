@@ -256,7 +256,11 @@ public class ExecutorEngine extends AbstractEngine{
 			}
 			Order op = getOppositeQueue(order.isAsk()).peek();
 			if(op == null) {
-				addSameQueue(order);
+				if(order.isMarket()) {
+					eventService.publishEvent(new CancelEvent(order, ExecutorEngine.this));
+				}else {
+					addSameQueue(order);
+				}
 				return;
 			}
 			if(!noneMatch(order, op)) {
