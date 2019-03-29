@@ -31,18 +31,12 @@ public class Order implements Comparable<Order>, Cloneable{
 
 	private boolean stop;
 	
-	private boolean marketDone;
-	
 	private Category category;
 	
 	private String extend;
 	
 	public boolean isDone() {
-		if(isMarket() && isBid()) {
-			return marketDone;
-		}else {
-			return amount.compareTo(BigDecimal.ZERO) == 0;
-		}
+		return amount.compareTo(BigDecimal.ZERO) == 0;
 	}
 
 	public boolean isBid() {
@@ -54,7 +48,8 @@ public class Order implements Comparable<Order>, Cloneable{
 	}
 
 	public void negate() {
-		amount = amount.negate();
+		if(amount != null)amount = amount.negate();
+		if(funds != null)funds = funds.negate();
 	}
 
 	public enum Side {

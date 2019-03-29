@@ -21,7 +21,7 @@ public abstract class AbstractEngine implements Engine{
 	
 	private String currencyPair;
 
-	private int quotePrecision;
+	private int quotePrecision = 8;
 	
 	protected static class SideComparator implements Comparator<Order> {
 
@@ -96,6 +96,11 @@ public abstract class AbstractEngine implements Engine{
 
 	protected static final boolean canMatch(Order bidOrder, Order askOrder) {
 		if(bidOrder.isMarket() || askOrder.isMarket()) {
+			if(bidOrder.isMarket()) {
+				bidOrder.setPrice(askOrder.getPrice());
+			}else {
+				askOrder.setPrice(bidOrder.getPrice());
+			}
 			return true;
 		}else {
 			return bidOrder.getPrice().compareTo(askOrder.getPrice()) >= 0;
@@ -104,19 +109,18 @@ public abstract class AbstractEngine implements Engine{
 	
 	protected BigDecimal getAmount(Order order, BigDecimal price) {
 		if(order.isMarket() && order.isBid()) {
-			order.setPrice(price);
 			return order.getFunds().divide(price, quotePrecision, RoundingMode.DOWN);
 		}else {
 			return order.getAmount();
 		}
 	}
 	
-	protected BigDecimal getAmount(Order bidOrder, Order askOrder) {
-		if(bidOrder.isMarket()) {
-			return getAmount(bidOrder, askOrder.getPrice()).min(askOrder.getAmount());
-		}else {
-			return bidOrder.getAmount().min(askOrder.getAmount());
-		}
+	protected BigDecimal getMinAmount(Order bidOrder, Order askOrder) {
+//		if(bidOrder.isMarket()) {
+		return getAmount(bidOrder, askOrder.getPrice()).min(askOrder.getAmount());
+//		}else {
+//			return bidOrder.getAmount().min(askOrder.getAmount());
+//		}
 	}
 	
 	
@@ -130,6 +134,14 @@ public abstract class AbstractEngine implements Engine{
 
 	public void setQuotePrecision(int quotePrecision) {
 		this.quotePrecision = quotePrecision;
+	}
+	
+	protected boolean orderIsDone(Order order) {
+		if(order.isMarket() && order.isBid()) {
+			return order.getFunds().divide(order.getPrice(), quotePrecision, RoundingMode.DOWN).compareTo(BigDecimal.ZERO) == 0;
+		}else {
+			return order.isDone();
+		}
 	}
 
 }

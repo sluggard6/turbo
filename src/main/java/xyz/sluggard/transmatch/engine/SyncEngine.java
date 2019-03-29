@@ -47,7 +47,7 @@ public class SyncEngine extends AbstractEngine {
 	
 	private void doOrder(Order order) {
 		if(order.isFok() && !fokCheck) {
-			SortedSet<Order> set = getOppositeSet(order.isAsk()).headSet(order);
+			SortedSet<Order> set = getOppositeSet(order.isBid()).headSet(order);
 			BigDecimal sum = set.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 			if(sum.compareTo(order.getAmount()) >= 0) {
 				fokCheck = true;
@@ -56,7 +56,7 @@ public class SyncEngine extends AbstractEngine {
 				return;
 			}
 		}
-		Order op = getOppositeQueue(order.isAsk()).peek();
+		Order op = getOppositeQueue(order.isBid()).peek();
 		if(op == null) {
 			if(order.isMarket()) {
 				eventService.publishEvent(new CancelEvent(order, this));
@@ -66,17 +66,16 @@ public class SyncEngine extends AbstractEngine {
 			return;
 		}
 		if(!noneMatch(order, op)) {
-			if(order.isIoc()) {
+			if(order.isMarket() || order.isIoc()) {
 				eventService.publishEvent(new CancelEvent(order, this));
 			}else {
 				addSameQueue(order);
 			}
-			return;
 		}else {
 			if(op.isDone()) {
-				getOppositeQueue(order.isAsk()).poll();
+				getOppositeQueue(order.isBid()).poll();
 			}
-			if(!order.isDone()) {
+			if(!orderIsDone(order)) {
 				doOrder(order);
 			}else {
 				if(order.isFok()) {
@@ -110,11 +109,8 @@ public class SyncEngine extends AbstractEngine {
 	private final boolean match(Order bidOrder, Order askOrder) {
 		if(canMatch(bidOrder, askOrder)) {
 //			BigDecimal min = bidOrder.getAmount().min(askOrder.getAmount());
-			BigDecimal min = getAmount(bidOrder, askOrder);
+			BigDecimal min = getMinAmount(bidOrder, askOrder);
 			if(min.compareTo(BigDecimal.ZERO) == 0) {
-				if(bidOrder.isMarket()) {
-					bidOrder.setMarketDone(true);
-				}
 				return false;
 			}
 			bidOrder.subtractAmount(min, askOrder.getPrice());
@@ -144,9 +140,12 @@ public class SyncEngine extends AbstractEngine {
 
 		public MatchPrice(Order maker, Order taker) {
 			super();
+			if(maker.isMarket()) {
+				throw new IllegalStateException("market order can't to be maker");
+			}
 			this.maker = maker;
 			this.taker = taker;
-			this.price = maker.isMarket() ? maker.getPrice() : taker.getPrice();
+			this.price = maker.getPrice();
 		}
 		
 	}
@@ -162,28 +161,28 @@ public class SyncEngine extends AbstractEngine {
 	
 	private void addSameQueue(Order order) {
 		eventService.publishEvent(new MakerEvent(order.clone(), this));
-		getSameQueue(order.isAsk()).add(order);
+		getSameQueue(order.isBid()).add(order);
 		
 	}
 
-	private Queue<Order> getOppositeQueue(boolean booleanSide) {
-		if(booleanSide) {
+	private Queue<Order> getOppositeQueue(boolean isBid) {
+		if(isBid) {
 			return askQueue;
 		}else {
 			return bidQueue;
 		}
 	}
 	
-	private NavigableSet<Order> getOppositeSet(boolean booleanSide) {
-		if(booleanSide) {
+	private NavigableSet<Order> getOppositeSet(boolean isBid) {
+		if(isBid) {
 			return askQueue;
 		}else {
 			return bidQueue;
 		}
 	}
 	
-	private Queue<Order> getSameQueue(boolean booleanSide) {
-		if(booleanSide) {
+	private Queue<Order> getSameQueue(boolean isBid) {
+		if(isBid) {
 			return bidQueue;
 		}else {
 			return askQueue;

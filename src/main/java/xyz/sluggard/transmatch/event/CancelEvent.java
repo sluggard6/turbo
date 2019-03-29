@@ -15,6 +15,7 @@ public class CancelEvent extends EngineEvent {
 	
 	public CancelEvent(Order order, Engine source) {
 		super(source);
+		order.negate();
 		this.order = order;
 	}
 

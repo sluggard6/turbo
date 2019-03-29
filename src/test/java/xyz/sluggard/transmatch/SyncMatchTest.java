@@ -152,12 +152,261 @@ public class SyncMatchTest {
 		engine.newOrder(order1);
 		engine.stop();
 		System.out.println("---------------market match------------------");
+		MatchEventCount mec = new MatchEventCount();
 		for(EngineEvent event : events) {
 			System.out.println(event);
 			if(event instanceof CancelEvent) {
 				assertEquals("1", ((CancelEvent) event).getOrder().getId());
+				mec.countCancelEvent();
 			}
 		}
+		assertEquals(1, mec.getCancelEventCount());
+	}
+	
+	@Test
+	public void marketBidMatch() throws Exception {
+		Order order1 = new Order("1", Type.MARKET, Side.ASK);
+		order1.setAmount(BigDecimal.valueOf(1));
+		engine.newOrder(order1);
+		engine.stop();
+		System.out.println("---------------market match------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				assertEquals("1", ((CancelEvent) event).getOrder().getId());
+				mec.countCancelEvent();
+			}
+		}
+		assertEquals(1, mec.getCancelEventCount());
+	}
+	
+	@Test
+	public void marketTradeMatch() throws Exception {
+		Order order1 = new Order("1", Type.LIMIT, Side.ASK);
+		order1.setPrice(new BigDecimal("1"));
+		order1.setAmount(new BigDecimal("3"));
+		Order order2 = new Order("2", Type.MARKET, Side.BID);
+		order2.setFunds(new BigDecimal(5));
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.stop();
+		System.out.println("---------------market trade match------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				assertEquals("2", ((CancelEvent) event).getOrder().getId());
+				mec.countCancelEvent();
+			}
+			if(event instanceof TradeEvent) {
+				assertEquals(0, ((TradeEvent) event).getTrade().getPrice().compareTo(BigDecimal.ONE));
+				mec.countTradeEvent();
+			}
+		}
+		assertEquals(1, mec.getCancelEventCount());
+		assertEquals(1, mec.getTradeEventCount());
+	}
+	
+	@Test
+	public void marketTradeMatch2() throws Exception {
+		Order order1 = new Order("1", Type.LIMIT, Side.BID);
+		order1.setPrice(new BigDecimal("1"));
+		order1.setAmount(new BigDecimal("3"));
+		Order order2 = new Order("2", Type.MARKET, Side.ASK);
+		order2.setAmount(new BigDecimal(5));
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.stop();
+		System.out.println("---------------market trade match2------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				assertEquals("2", ((CancelEvent) event).getOrder().getId());
+				mec.countCancelEvent();
+			}
+			if(event instanceof TradeEvent) {
+				assertEquals(0, ((TradeEvent) event).getTrade().getPrice().compareTo(BigDecimal.ONE));
+				mec.countTradeEvent();
+			}
+		}
+		assertEquals(1, mec.getCancelEventCount());
+		assertEquals(1, mec.getTradeEventCount());
+	}
+	
+	@Test
+	public void marketTradeMatch3() throws Exception {
+		Order order1 = new Order("1", Type.LIMIT, Side.ASK);
+		order1.setPrice(new BigDecimal("1"));
+		order1.setAmount(new BigDecimal("3"));
+		Order order2 = new Order("2", Type.MARKET, Side.BID);
+		order2.setFunds(new BigDecimal(3));
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.stop();
+		System.out.println("---------------market trade match3------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				mec.countCancelEvent();
+			}
+			if(event instanceof TradeEvent) {
+				assertEquals(0, ((TradeEvent) event).getTrade().getPrice().compareTo(BigDecimal.ONE));
+				mec.countTradeEvent();
+			}
+		}
+		assertEquals(0, mec.getCancelEventCount());
+		assertEquals(1, mec.getTradeEventCount());
+	}
+	
+	
+	@Test
+	public void marketTradeMatch4() throws Exception {
+		Order order1 = new Order("1", Type.LIMIT, Side.BID);
+		order1.setPrice(new BigDecimal("1"));
+		order1.setAmount(new BigDecimal("3"));
+		Order order2 = new Order("2", Type.MARKET, Side.ASK);
+		order2.setAmount(new BigDecimal(3));
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.stop();
+		System.out.println("---------------market trade match4------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				mec.countCancelEvent();
+			}
+			if(event instanceof TradeEvent) {
+				assertEquals(0, ((TradeEvent) event).getTrade().getPrice().compareTo(BigDecimal.ONE));
+				mec.countTradeEvent();
+			}
+		}
+		assertEquals(0, mec.getCancelEventCount());
+		assertEquals(1, mec.getTradeEventCount());
+	}
+	
+	@Test
+	public void marketTradeMatch5() throws Exception {
+		Order order1 = new Order("1", Type.LIMIT, Side.ASK);
+		order1.setPrice(new BigDecimal("1"));
+		order1.setAmount(new BigDecimal("3"));
+		Order order2 = new Order("2", Type.MARKET, Side.BID);
+		order2.setFunds(new BigDecimal("2.5"));
+		engine.setQuotePrecision(0);
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.stop();
+		System.out.println("---------------market trade match5------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				assertEquals("2", ((CancelEvent) event).getOrder().getId());
+				assertEquals(0, ((CancelEvent) event).getOrder().getFunds().negate().compareTo(new BigDecimal("0.5")));
+				mec.countCancelEvent();
+			}
+			if(event instanceof TradeEvent) {
+				assertEquals(0, ((TradeEvent) event).getTrade().getPrice().compareTo(BigDecimal.ONE));
+				mec.countTradeEvent();
+			}
+		}
+		assertEquals(1, mec.getCancelEventCount());
+		assertEquals(1, mec.getTradeEventCount());
+	}
+	
+
+	
+	@Test
+	public void marketSideTest() {
+		Order order1 = new Order("1", Type.LIMIT, Side.ASK);
+		order1.setPrice(BigDecimal.valueOf(5));
+		order1.setAmount(BigDecimal.valueOf(50));
+		Order order2 = new Order("2", Type.LIMIT, Side.BID);
+		order2.setPrice(BigDecimal.valueOf(4));
+		order2.setAmount(BigDecimal.valueOf(50));
+		Order order3 = new Order("3", Type.MARKET, Side.BID);
+		order3.setFunds(BigDecimal.valueOf(150));
+		Order order4 = new Order("4", Type.MARKET, Side.ASK);
+		order4.setAmount(BigDecimal.valueOf(30));
+		Order order5 = new Order("5", Type.MARKET, Side.BID);
+		order5.setFunds(BigDecimal.valueOf(150));
+		Order order6 = new Order("6", Type.MARKET, Side.ASK);
+		order6.setAmount(BigDecimal.valueOf(30));
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.newOrder(order3);
+		engine.newOrder(order4);
+		engine.newOrder(order5);
+		engine.newOrder(order6);
+		engine.stop();
+		System.out.println("---------------market side match------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				mec.countCancelEvent();
+			}
+			if(event instanceof TradeEvent) {
+				mec.countTradeEvent();
+			}
+		}
+		assertEquals(2, mec.getCancelEventCount());
+		assertEquals(4, mec.getTradeEventCount());
+	}
+	
+	@Test
+	public void marketPartMatchTest() {
+		Order order1 = new Order("1", Type.LIMIT, Side.ASK);
+		order1.setPrice(new BigDecimal("0.52"));
+		order1.setAmount(BigDecimal.valueOf(500));
+		Order order2 = new Order("2", Type.MARKET, Side.BID);
+		order2.setFunds(BigDecimal.valueOf(1));
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.stop();
+		System.out.println("---------------market part match------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof CancelEvent) {
+				mec.countCancelEvent();
+			}
+			if(event instanceof TradeEvent) {
+				mec.countTradeEvent();
+			}
+		}
+		assertEquals(1, mec.getCancelEventCount());
+		assertEquals(1, mec.getTradeEventCount());
+	}
+	
+	@Test 
+	public void sideQueueTest() {
+		Order order1 = new Order("1", Type.LIMIT, Side.ASK);
+		order1.setPrice(new BigDecimal("2"));
+		order1.setAmount(new BigDecimal("3"));
+		Order order2 = new Order("1", Type.LIMIT, Side.ASK);
+		order2.setPrice(new BigDecimal("2"));
+		order2.setAmount(new BigDecimal("3"));
+		Order order3 = new Order("1", Type.LIMIT, Side.BID);
+		order3.setPrice(new BigDecimal("1"));
+		order3.setAmount(new BigDecimal("3"));
+		Order order4 = new Order("1", Type.LIMIT, Side.BID);
+		order4.setPrice(new BigDecimal("1"));
+		order4.setAmount(new BigDecimal("3"));
+		Order order5 = new Order("1", Type.LIMIT, Side.BID);
+		order5.setPrice(new BigDecimal("1"));
+		order5.setAmount(new BigDecimal("3"));
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.newOrder(order3);
+		engine.newOrder(order4);
+		engine.newOrder(order5);
+		assertEquals(2, engine.getAskQueue().size());
+		assertEquals(3, engine.getBidQueue().size());
+		engine.stop();
 	}
 
 }

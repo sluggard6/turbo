@@ -47,4 +47,15 @@ public class SortedSetQueue<E> extends ConcurrentSkipListSet<E> implements Queue
 		super(comparator);
 	}
 
+	public String toString() {
+		if(isEmpty()) {
+			return "SortedSetQueue=[]";
+		}
+		StringBuilder builder = new StringBuilder("SortedSetQueue=[");
+		this.forEach(e -> {
+			builder.append(e).append(",");
+		});
+		return builder.substring(0, this.size() - 1)+"]";
+		
+	}
 }

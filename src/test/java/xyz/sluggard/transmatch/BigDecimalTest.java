@@ -52,6 +52,9 @@ public class BigDecimalTest {
 		BigDecimal b1 = new BigDecimal("0.000000002");
 		BigDecimal b2 = new BigDecimal("0.01");
 		assertEquals(0, b1.divide(b2, 4, RoundingMode.DOWN).compareTo(BigDecimal.ZERO));
+		b1 = new BigDecimal(5);
+		b2 = new BigDecimal(1);
+		assertEquals(0, b1.divide(b2, 8, RoundingMode.DOWN).compareTo(new BigDecimal(5)));
 	}
 
 }
