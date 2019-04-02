@@ -16,9 +16,10 @@ import xyz.sluggard.transmatch.entity.Order.Side;
 import xyz.sluggard.transmatch.entity.Trade;
 import xyz.sluggard.transmatch.event.CancelEvent;
 import xyz.sluggard.transmatch.event.MakerEvent;
+import xyz.sluggard.transmatch.event.OrderEvent;
 import xyz.sluggard.transmatch.event.TradeEvent;
 import xyz.sluggard.transmatch.service.EventService;
-import xyz.sluggard.transmatch.service.impl.AbstractEventService;
+import xyz.sluggard.transmatch.service.InitService;
 
 public class SyncEngine extends AbstractEngine {
 
@@ -35,12 +36,17 @@ public class SyncEngine extends AbstractEngine {
 		super(currencyPair);
 	}
 
-	public SyncEngine(String currencyPair, AbstractEventService eventService) {
+	public SyncEngine(String currencyPair, EventService eventService) {
 		super(currencyPair, eventService);
+	}
+	
+	public SyncEngine(String currencyPair, EventService eventService, InitService initService) {
+		super(currencyPair, eventService, initService);
 	}
 
 	@Override
 	public boolean newOrder(Order order) {
+		eventService.publishEvent(new OrderEvent(order.clone(), this));
 		doOrder(order);
 		return true;
 	}

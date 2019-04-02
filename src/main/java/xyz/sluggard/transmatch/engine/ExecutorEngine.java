@@ -3,7 +3,6 @@ package xyz.sluggard.transmatch.engine;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.NavigableSet;
 import java.util.Queue;
@@ -36,29 +35,29 @@ public class ExecutorEngine extends AbstractEngine{
 
 	private final SortedSetQueue<Order> askQueue = new SortedSetQueue<>(new SideComparator());
 	
-	private static class SideComparator implements Comparator<Order> {
-
-		@Override
-		public int compare(Order o1, Order o2) {
-			if(o1.isAsk()^o2.isAsk()) {
-				if(o1.isAsk()) {
-					if(canMatch(o2, o1)) {
-						return -1;
-					}else {
-						return 1;
-					}
-				}else {
-					if(canMatch(o1, o2)) {
-						return -1;
-					}else {
-						return 1;
-					}
-				}
-			}else {
-				return o1.compareTo(o2);
-			}
-		}
-	}
+//	private static class SideComparator implements Comparator<Order> {
+//
+//		@Override
+//		public int compare(Order o1, Order o2) {
+//			if(o1.isAsk()^o2.isAsk()) {
+//				if(o1.isAsk()) {
+//					if(canMatch(o2, o1)) {
+//						return -1;
+//					}else {
+//						return 1;
+//					}
+//				}else {
+//					if(canMatch(o1, o2)) {
+//						return -1;
+//					}else {
+//						return 1;
+//					}
+//				}
+//			}else {
+//				return o1.compareTo(o2);
+//			}
+//		}
+//	}
 	
 	private boolean fokCheck;
 	

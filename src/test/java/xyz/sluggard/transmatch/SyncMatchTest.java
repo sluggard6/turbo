@@ -408,5 +408,39 @@ public class SyncMatchTest {
 		assertEquals(3, engine.getBidQueue().size());
 		engine.stop();
 	}
+	
+	@Test
+	public void realDataTest() {
+		Order order1 = new Order("1", Type.LIMIT, Side.BID);
+		order1.setPrice(new BigDecimal("0.29"));
+		order1.setAmount(new BigDecimal("9"));
+		Order order2 = new Order("2", Type.LIMIT, Side.BID);
+		order2.setPrice(new BigDecimal("0.28"));
+		order2.setAmount(new BigDecimal("5"));
+		Order order3 = new Order("3", Type.LIMIT, Side.ASK);
+		order3.setPrice(new BigDecimal("0.28"));
+		order3.setAmount(new BigDecimal("3"));
+		engine.newOrder(order1);
+		engine.newOrder(order2);
+		engine.newOrder(order3);
+		System.out.println("---------------real data test------------------");
+		MatchEventCount mec = new MatchEventCount();
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof MakerEvent) {
+				mec.countMakerEvent();
+			}
+			if(event instanceof OrderEvent) {
+				mec.countOrderEvent();
+			}
+			if(event instanceof CancelEvent) {
+				mec.countCancelEvent();
+			}
+			if(event instanceof TradeEvent) {
+				mec.countTradeEvent();
+			}
+		}
+		assertEquals(2, engine.getBidQueue().size());
+	}
 
 }
