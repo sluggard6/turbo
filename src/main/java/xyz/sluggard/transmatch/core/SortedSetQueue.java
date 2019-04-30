@@ -40,7 +40,6 @@ public class SortedSetQueue<E> extends ConcurrentSkipListSet<E> implements Queue
 	}
 
 	public SortedSetQueue() {
-		// TODO Auto-generated constructor stub
 	}
 
 	public SortedSetQueue(Comparator<? super E> comparator) {
@@ -55,7 +54,7 @@ public class SortedSetQueue<E> extends ConcurrentSkipListSet<E> implements Queue
 		this.forEach(e -> {
 			builder.append(e).append(",");
 		});
-		return builder.substring(0, this.size() - 1)+"]";
+		return builder.substring(0, builder.length() - 1)+"]";
 		
 	}
 }

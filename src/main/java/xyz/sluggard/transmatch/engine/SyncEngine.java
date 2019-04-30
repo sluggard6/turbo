@@ -230,10 +230,9 @@ public class SyncEngine extends AbstractEngine {
 	private Order cancelOrderIter(Queue<Order> queue, String orderId) {
 		Iterator<Order> iter = queue.iterator();
 		while(iter.hasNext()) {
-			Order  order = iter.next();
+			Order order = iter.next();
 			if(order.getId().equals(orderId)) {
 				iter.remove();
-				order.negate();
 				eventService.publishEvent(new CancelEvent(order.clone(), this));
 				return order;
 			}
