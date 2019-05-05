@@ -25,9 +25,9 @@ public class SyncEngine extends AbstractEngine {
 //
 //	private final SortedSetQueue<Order> askQueue = new SortedSetQueue<>(new SideComparator());
 	
-	private final Queue<Order> bidQueue = new PriorityBlockingQueue<>(11, new SideComparator());
+	private final Queue<Order> bidQueue = new PriorityBlockingQueue<>();
 	
-	private final Queue<Order> askQueue = new PriorityBlockingQueue<>(11, new SideComparator());
+	private final Queue<Order> askQueue = new PriorityBlockingQueue<>();
 	
 //	private final Queue<Action> actionQueue = new ConcurrentLinkedQueue<>();
 	
@@ -237,16 +237,24 @@ public class SyncEngine extends AbstractEngine {
 	}
 	
 	private Order cancelOrderIter(Queue<Order> queue, String orderId) {
-		Iterator<Order> iter = queue.iterator();
-		while(iter.hasNext()) {
-			Order order = iter.next();
-			if(order.getId().equals(orderId)) {
-				iter.remove();
-				eventService.publishEvent(new CancelEvent(order.clone(), this));
-				return order;
+		try {
+			Iterator<Order> iter = queue.iterator();
+			while(iter.hasNext()) {
+				Order order = iter.next();
+				if(order.getId().equals(orderId)) {
+					iter.remove();
+					eventService.publishEvent(new CancelEvent(order.clone(), this));
+					return order;
+				}
+			}
+			return null;
+		} finally {
+			if(queue.stream().filter(o -> {
+				return o.getId().equals(orderId);
+			}).count() > 0) {
+				throw new RuntimeException("double check faile, cancel '" + orderId + "' order failed!!!");
 			}
 		}
-		return null;
 	}
 
 }
