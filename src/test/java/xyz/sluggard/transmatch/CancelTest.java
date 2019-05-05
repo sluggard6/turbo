@@ -9,8 +9,8 @@ import java.math.BigDecimal;
 import org.testng.annotations.Test;
 
 import xyz.sluggard.transmatch.entity.Order;
-import xyz.sluggard.transmatch.entity.Trade;
 import xyz.sluggard.transmatch.entity.Order.Side;
+import xyz.sluggard.transmatch.entity.Trade;
 import xyz.sluggard.transmatch.event.CancelEvent;
 import xyz.sluggard.transmatch.event.EngineEvent;
 import xyz.sluggard.transmatch.event.MakerEvent;

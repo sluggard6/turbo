@@ -168,6 +168,7 @@ public class ThreadWapper implements Engine {
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
+				log.error("match error", e);
 				return false;
 			}
 		}

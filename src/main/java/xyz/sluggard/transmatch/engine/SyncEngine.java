@@ -3,14 +3,12 @@ package xyz.sluggard.transmatch.engine;
 import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.NavigableSet;
 import java.util.Queue;
-import java.util.SortedSet;
+import java.util.concurrent.PriorityBlockingQueue;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
-import xyz.sluggard.transmatch.core.SortedSetQueue;
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
 import xyz.sluggard.transmatch.entity.Trade;
@@ -23,9 +21,13 @@ import xyz.sluggard.transmatch.service.InitService;
 
 public class SyncEngine extends AbstractEngine {
 
-	private final SortedSetQueue<Order> bidQueue = new SortedSetQueue<>(new SideComparator());
-
-	private final SortedSetQueue<Order> askQueue = new SortedSetQueue<>(new SideComparator());
+//	private final SortedSetQueue<Order> bidQueue = new SortedSetQueue<>(new SideComparator());
+//
+//	private final SortedSetQueue<Order> askQueue = new SortedSetQueue<>(new SideComparator());
+	
+	private final Queue<Order> bidQueue = new PriorityBlockingQueue<>(11, new SideComparator());
+	
+	private final Queue<Order> askQueue = new PriorityBlockingQueue<>(11, new SideComparator());
 	
 //	private final Queue<Action> actionQueue = new ConcurrentLinkedQueue<>();
 	
@@ -53,8 +55,15 @@ public class SyncEngine extends AbstractEngine {
 	
 	private void doOrder(Order order) {
 		if(order.isFok() && !fokCheck) {
-			SortedSet<Order> set = getOppositeSet(order.isBid()).headSet(order);
-			BigDecimal sum = set.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+//			SortedSet<Order> set = getOppositeQueue(order.isBid()).headSet(order);
+//			BigDecimal sum = set.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+			BigDecimal sum = getOppositeQueue(order.isBid()).stream().filter(o->{
+				if(order.isBid()) {
+					return canMatch(order, o);
+				}else {
+					return canMatch(o, order);
+				}
+			}).map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 			if(sum.compareTo(order.getAmount()) >= 0) {
 				fokCheck = true;
 			}else {
@@ -179,13 +188,13 @@ public class SyncEngine extends AbstractEngine {
 		}
 	}
 	
-	private NavigableSet<Order> getOppositeSet(boolean isBid) {
-		if(isBid) {
-			return askQueue;
-		}else {
-			return bidQueue;
-		}
-	}
+//	private NavigableSet<Order> getOppositeSet(boolean isBid) {
+//		if(isBid) {
+//			return askQueue;
+//		}else {
+//			return bidQueue;
+//		}
+//	}
 	
 	private Queue<Order> getSameQueue(boolean isBid) {
 		if(isBid) {
