@@ -1,6 +1,7 @@
 # turbo
 
-[![Build Status](https://travis-ci.org/sluggard6/turbo?branch=master)](https://travis-ci.org/sluggard6/turbo)
+[![Build Status](https://travis-ci.org/sluggard6/turbo.svg?branch=master)](https://travis-ci.org/sluggard6/turbo)
+![license](https://img.shields.io/github/license/alibaba/dubbo.svg)
 
 A Market Order Matching Engine
 
