@@ -20,4 +20,4 @@ after_success:
   - bash <(curl -s https://codecov.io/bash)
 
 after_failure:
-  - if [ -f dubbo.log ]; then echo "------TAIL of dubbo.log------"; tail -n 1000 dubbo.log; echo "------END of dubbo.log------"; fi
+  - if [ -f turbo.log ]; then echo "------TAIL of turbo.log------"; tail -n 1000 turbo.log; echo "------END of turbo.log------"; fi
