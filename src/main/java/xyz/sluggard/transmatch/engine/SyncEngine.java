@@ -18,6 +18,7 @@ import xyz.sluggard.transmatch.event.OrderEvent;
 import xyz.sluggard.transmatch.event.TradeEvent;
 import xyz.sluggard.transmatch.service.EventService;
 import xyz.sluggard.transmatch.service.InitService;
+import xyz.sluggard.transmatch.utils.IdManager;
 
 public class SyncEngine extends AbstractEngine {
 
@@ -255,6 +256,11 @@ public class SyncEngine extends AbstractEngine {
 				throw new RuntimeException("double check faile, cancel '" + orderId + "' order failed!!!");
 			}
 		}
+	}
+
+	@Override
+	public long getUpdateId() {
+		return IdManager.getId();
 	}
 
 }

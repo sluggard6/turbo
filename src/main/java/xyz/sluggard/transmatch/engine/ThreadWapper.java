@@ -104,6 +104,11 @@ public class ThreadWapper implements Engine {
 	}
 
 	@Override
+	public long getUpdateId() {
+		return proxy.getUpdateId();
+	}
+
+	@Override
 	@PostConstruct
 	public void start() {
 		try {

@@ -29,5 +29,9 @@ public interface Engine {
 	void start();
 
 	void stop();
+	
+	default long getUpdateId() {
+		throw new UnsupportedOperationException("未实现的方法");
+	}
 
 }

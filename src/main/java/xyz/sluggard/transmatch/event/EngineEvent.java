@@ -16,7 +16,7 @@ public abstract class EngineEvent extends EventObject {
 	
 	public EngineEvent(Engine engine) {
 		super(engine);
-		updateId = IdManager.getId();
+		updateId = IdManager.makeId();
 	}
 
 	public String getEventName() {
