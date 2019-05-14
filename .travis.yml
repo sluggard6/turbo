@@ -15,7 +15,7 @@ install: true
 
 script:
   - ./gradlew check
-  - ./gradlew codeCoverageReport
+  - ./gradlew jacocoTestReport
   - travis_wait 30 ./gradlew clean build -x test
   
 after_success:
