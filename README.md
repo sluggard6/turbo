@@ -1,5 +1,7 @@
 # turbo
 
+[![Build Status](https://travis-ci.org/sluggard6/turbo?branch=master)](https://travis-ci.org/sluggard6/turbo)
+
 A Market Order Matching Engine
 
 
