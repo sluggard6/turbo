@@ -2,6 +2,7 @@ package xyz.sluggard.transmatch.engine;
 
 import java.math.BigDecimal;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
@@ -212,12 +213,12 @@ public class SyncEngine extends AbstractEngine {
 
 	@Override
 	public Collection<Order> getBidQueue() {
-		return this.bidQueue;
+		return Collections.unmodifiableCollection(bidQueue);
 	}
 
 	@Override
 	public Collection<Order> getAskQueue() {
-		return this.askQueue;
+		return Collections.unmodifiableCollection(askQueue);
 	}
 
 	@Override
