@@ -1,11 +1,16 @@
 package xyz.sluggard.transmatch.engine;
 
+import static xyz.sluggard.transmatch.utils.OrderValidater.validateOrder;
+
 import java.util.Collection;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -14,14 +19,17 @@ import lombok.extern.slf4j.Slf4j;
 import xyz.sluggard.transmatch.core.Engine;
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
+import xyz.sluggard.transmatch.entity.OrderBook;
 import xyz.sluggard.transmatch.service.EventService;
 import xyz.sluggard.transmatch.service.InitService;
 
 @Slf4j
 public class ThreadWapper implements Engine {
 	
-
-	private static final long TIME_OUT = 5000;
+	/**
+	 * 5秒最长等待时间
+	 */
+	private static final int TIME_OUT = 5;
 	
 	
 	public ThreadWapper(String currencyPair) {
@@ -47,28 +55,20 @@ public class ThreadWapper implements Engine {
 
 	@Override
 	public boolean newOrder(Order order) {
-		executorService.submit(new Command(order));
-		return true;
+		if(validateOrder(order)) {
+			executorService.submit(new Command(order));
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public boolean cancelOrder(String orderId, Side side) {
-		long start = System.currentTimeMillis();
 		try {
 			Future<Boolean> future = executorService.submit(new Command(orderId, side));
-			while (!future.isDone()) {
-				// 超时判断
-				if (System.currentTimeMillis() - start > TIME_OUT) {
-					if(log.isWarnEnabled()) {
-						log.warn("cancel order timeout : " + (System.currentTimeMillis() - start));
-					}
-					return false;
-				}
-				Thread.sleep(100);
-			}
-			return future.get();
-		} catch (InterruptedException | ExecutionException e) {
-			e.printStackTrace();
+			return future.get(TIME_OUT, TimeUnit.SECONDS);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			log.error("cancel order error", e);
 		}
 		return false;
 	}
@@ -106,6 +106,17 @@ public class ThreadWapper implements Engine {
 	@Override
 	public long getUpdateId() {
 		return proxy.getUpdateId();
+	}
+
+	@Override
+	public OrderBook getOrderBook() {
+		try {
+			Future<OrderBook> future = executorService.submit(new OrderBookCommand());
+			return future.get(TIME_OUT, TimeUnit.SECONDS);
+		} catch (InterruptedException | ExecutionException | TimeoutException e) {
+			log.error("getOrderBook error", e);
+			return new OrderBook();
+		}
 	}
 
 	@Override
@@ -177,5 +188,17 @@ public class ThreadWapper implements Engine {
 				return false;
 			}
 		}
+	}
+	
+	private class OrderBookCommand implements Callable<OrderBook>{
+
+		@Override
+		public OrderBook call() throws Exception {
+			OrderBook orderBook = new OrderBook();
+			orderBook.setAsks(new TreeSet<>(getAskQueue()));
+			orderBook.setBids(new TreeSet<>(getBidQueue()));
+			return orderBook;
+		}
+		
 	}
 }

@@ -4,6 +4,7 @@ import java.util.Collection;
 
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
+import xyz.sluggard.transmatch.entity.OrderBook;
 import xyz.sluggard.transmatch.service.EventService;
 
 public interface Engine {
@@ -25,6 +26,10 @@ public interface Engine {
 	Collection<Order> getAskQueue();
 	
 	EventService getEventService();
+	
+	default OrderBook getOrderBook() {
+		throw new UnsupportedOperationException("not implement yet!");
+	}
 
 	void start();
 
