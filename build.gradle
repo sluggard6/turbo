@@ -1,5 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
+apply plugin: 'maven-publish'
 
 group = 'xyz.sluggard'
 version = '0.1.13-SNAPSHOT'
