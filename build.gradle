@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 
 group = 'xyz.sluggard'
-version = '0.1.12-SNAPSHOT'
+version = '0.1.13-SNAPSHOT'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -46,4 +46,29 @@ task codeCoverageReport(type: JacocoReport) {
 }
 
  test.useTestNG()
+ 
+//上传nexus
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            
+            artifact sourcesJar {
+                classifier "sources"
+            }
+        }
+        
+    }
+    
+    repositories {
+    	maven {
+        	url "http://maven.elitex.io/nexus/content/repositories/snapshots/"
+			//url "http://10.0.0.205:8081/repository/maven-snapshots/"
+			credentials {
+			 	username "$nexusUser"
+				password "$nexusPwd"
+			}
+		}
+	}
+}
  
