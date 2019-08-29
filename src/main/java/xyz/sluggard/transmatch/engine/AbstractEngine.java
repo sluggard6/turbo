@@ -21,7 +21,7 @@ public abstract class AbstractEngine implements Engine{
 	
 	private String currencyPair;
 
-	private int quotePrecision = 8;
+	private int quotePrecision = 10;
 	
 	protected static class SideComparator implements Comparator<Order> {
 
