@@ -20,6 +20,7 @@ import xyz.sluggard.transmatch.core.Engine;
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
 import xyz.sluggard.transmatch.entity.OrderBook;
+import xyz.sluggard.transmatch.event.OrderBookEvent;
 import xyz.sluggard.transmatch.service.EventService;
 import xyz.sluggard.transmatch.service.InitService;
 
@@ -109,13 +110,13 @@ public class ThreadWapper implements Engine {
 	}
 
 	@Override
-	public OrderBook getOrderBook() {
+	public OrderBookEvent getOrderBook() {
 		try {
-			Future<OrderBook> future = executorService.submit(new OrderBookCommand());
+			Future<OrderBookEvent> future = executorService.submit(new OrderBookCommand());
 			return future.get(TIME_OUT, TimeUnit.SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			log.error("getOrderBook error", e);
-			return new OrderBook();
+			return null;
 		}
 	}
 
@@ -190,14 +191,14 @@ public class ThreadWapper implements Engine {
 		}
 	}
 	
-	private class OrderBookCommand implements Callable<OrderBook>{
+	private class OrderBookCommand implements Callable<OrderBookEvent>{
 
 		@Override
-		public OrderBook call() throws Exception {
+		public OrderBookEvent call() throws Exception {
 			OrderBook orderBook = new OrderBook();
 			orderBook.setAsks(new TreeSet<>(getAskQueue()));
 			orderBook.setBids(new TreeSet<>(getBidQueue()));
-			return orderBook;
+			return new OrderBookEvent(orderBook, proxy);
 		}
 		
 	}
