@@ -85,6 +85,33 @@ public class SyncMatchTest {
 	}
 	
 	@Test
+	public void OneMatchOp() throws Exception {
+		Order order1 = new Order("1", BigDecimal.ONE, BigDecimal.ONE, Side.ASK);
+		Order order2 = new Order("2", BigDecimal.ONE, BigDecimal.ONE, Side.BID);
+		engine.newOrder(order2);
+		engine.newOrder(order1);
+		engine.stop();
+		System.out.println("---------------one match op------------------");
+		for(EngineEvent event : events) {
+			System.out.println(event);
+			if(event instanceof TradeEvent) {
+				Trade trade = ((TradeEvent) event).getTrade();
+				assertTrue(trade.getAmount().compareTo(BigDecimal.ONE) == 0);
+				assertTrue(trade.getPrice().compareTo(BigDecimal.ONE) == 0);
+				assertTrue(trade.getAskOrderId().equals("1"));
+				assertTrue(trade.getBidOrderId().equals("2"));
+				assertTrue(trade.getMakerOrderId().equals("2"));
+				assertTrue(trade.getTakerOrderId().equals("1"));
+			}
+			if(event instanceof OrderEvent) {
+				assertFalse(((OrderEvent) event).getOrder().isDone());
+			}if(event instanceof MakerEvent) {
+				assertTrue(((MakerEvent) event).getOrder().getId().equals("2"));
+			}
+		}
+	}
+	
+	@Test
 	public void TowMatch() throws Exception {
 		Order order1 = new Order("1", BigDecimal.valueOf(2), BigDecimal.ONE, Side.ASK);
 		Order order2 = new Order("2", BigDecimal.ONE, BigDecimal.ONE, Side.BID);
@@ -317,6 +344,10 @@ public class SyncMatchTest {
 		assertEquals(1, mec.getTradeEventCount());
 	}
 	
+//	@Test
+//	public void marketTradeMatch6() throws Exception {
+//		
+//	}
 
 	
 	@Test

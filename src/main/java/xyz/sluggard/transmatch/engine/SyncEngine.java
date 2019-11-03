@@ -50,6 +50,7 @@ public class SyncEngine extends AbstractEngine {
 
 	@Override
 	public boolean newOrder(Order order) {
+		order.setNanotime(System.nanoTime());
 		eventService.publishEvent(new OrderEvent(order.clone(), this));
 		doOrder(order);
 		return true;

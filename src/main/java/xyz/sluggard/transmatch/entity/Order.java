@@ -16,7 +16,7 @@ public class Order implements Comparable<Order>, Cloneable{
 	
 	private BigDecimal funds;
 	
-	private long nanotime = System.nanoTime();
+	private long nanotime;
 	
 	private long timestamp = System.currentTimeMillis();
 	
