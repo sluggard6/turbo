@@ -12,6 +12,7 @@ import javax.annotation.PreDestroy;
 
 import xyz.sluggard.transmatch.entity.Order;
 import xyz.sluggard.transmatch.entity.Order.Side;
+import xyz.sluggard.transmatch.entity.Order.Status;
 import xyz.sluggard.transmatch.entity.Trade;
 import xyz.sluggard.transmatch.event.CancelEvent;
 import xyz.sluggard.transmatch.event.MakerEvent;
@@ -140,13 +141,21 @@ public class SyncEngine extends AbstractEngine {
 		}
 		return false;
 	}
-	
+		
 	private static final MatchPrice getPrice(Order o1, Order o2) {
-		if(o1.getNanotime() < o2.getNanotime()) {
+		if(o1.getStatus() == o2.getStatus()) {
+			throw new IllegalStateException("不能同时出现2个"+o1.getStatus());
+		}
+		if(o1.isMaker()) {
 			return new MatchPrice(o1, o2);
 		}else {
 			return new MatchPrice(o2, o1);
 		}
+//		if(o1.getNanotime() < o2.getNanotime()) {
+//			return new MatchPrice(o1, o2);
+//		}else {
+//			return new MatchPrice(o2, o1);
+//		}
 	}
 	
 	private static class MatchPrice {
@@ -178,6 +187,7 @@ public class SyncEngine extends AbstractEngine {
 	}
 	
 	private void addSameQueue(Order order) {
+		order.setStatus(Status.MAKER);
 		eventService.publishEvent(new MakerEvent(order.clone(), this));
 		getSameQueue(order.isBid()).add(order);
 		
