@@ -33,6 +33,8 @@ public class Order implements Comparable<Order>, Cloneable{
 	
 	private Category category;
 	
+	private Status status;
+	
 	private String extend;
 	
 	public boolean isDone() {
@@ -74,6 +76,10 @@ public class Order implements Comparable<Order>, Cloneable{
 		 */
 		FOK;
 	}
+	
+	public enum Status {
+		TAKER,MAKER;
+	}
 
 	@Override
 	public int compareTo(Order o) {
@@ -96,37 +102,6 @@ public class Order implements Comparable<Order>, Cloneable{
 			return Math.negateExact(i);
 		}
 	}
-	
-//	public static OrderBuilder builder() {
-//		return new OrderBuilder() {
-//			
-//			private Order value;
-//			
-//			private void checkOrder() {
-//				if(value == null) {
-//					this.value = new Order();
-//				}
-//			}
-//			
-//			@Override
-//			public OrderBuilder marketOrder() {
-//				checkOrder();
-//				value.setType(Type.MARKET);
-//				return null;
-//			}
-//			
-//			@Override
-//			public Order build() {
-//				try {
-//					checkOrder();
-//					return value;
-//				}finally {
-//					value = null;
-//				}
-//			}
-//		};
-//	}
-	
 	
 	public Order(String id, Type type, Side side) {
 		this(id, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, side, type, null, null);
@@ -178,6 +153,7 @@ public class Order implements Comparable<Order>, Cloneable{
 		}else {
 			this.category = category;
 		}
+		this.status = Status.TAKER;
 		this.extend = extend;
 	}
 
@@ -204,6 +180,10 @@ public class Order implements Comparable<Order>, Cloneable{
 		}else {
 			this.amount = this.amount.subtract(amount);
 		}
+	}
+
+	public boolean isMaker() {
+		return status == Status.MAKER;
 	}
 
 }

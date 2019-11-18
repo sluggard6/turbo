@@ -2,7 +2,7 @@ apply plugin: 'java'
 apply plugin: 'jacoco'
 
 group = 'xyz.sluggard'
-version = '0.1.14-SNAPSHOT'
+version = '0.1.15-SNAPSHOT'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
