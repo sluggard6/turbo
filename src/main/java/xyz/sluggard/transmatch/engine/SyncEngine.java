@@ -27,16 +27,15 @@ public class SyncEngine extends AbstractEngine {
 //	private final SortedSetQueue<Order> bidQueue = new SortedSetQueue<>(new SideComparator());
 //
 //	private final SortedSetQueue<Order> askQueue = new SortedSetQueue<>(new SideComparator());
-	
+
 	private final Queue<Order> bidQueue = new PriorityBlockingQueue<>();
-	
+
 	private final Queue<Order> askQueue = new PriorityBlockingQueue<>();
-	
+
 //	private final Queue<Action> actionQueue = new ConcurrentLinkedQueue<>();
-	
+
 	private boolean fokCheck;
-	
-	
+
 	public SyncEngine(String currencyPair) {
 		super(currencyPair);
 	}
@@ -44,7 +43,7 @@ public class SyncEngine extends AbstractEngine {
 	public SyncEngine(String currencyPair, EventService eventService) {
 		super(currencyPair, eventService);
 	}
-	
+
 	public SyncEngine(String currencyPair, EventService eventService, InitService initService) {
 		super(currencyPair, eventService, initService);
 	}
@@ -56,99 +55,101 @@ public class SyncEngine extends AbstractEngine {
 		doOrder(order);
 		return true;
 	}
-	
+
 	private void doOrder(Order order) {
-		if(order.isFok() && !fokCheck) {
+		if (order.isFok() && !fokCheck) {
 //			SortedSet<Order> set = getOppositeQueue(order.isBid()).headSet(order);
 //			BigDecimal sum = set.stream().map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-			BigDecimal sum = getOppositeQueue(order.isBid()).stream().filter(o->{
-				if(order.isBid()) {
+			BigDecimal sum = getOppositeQueue(order.isBid()).stream().filter(o -> {
+				if (order.isBid()) {
 					return canMatch(order, o);
-				}else {
+				} else {
 					return canMatch(o, order);
 				}
 			}).map(Order::getAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
-			if(sum.compareTo(order.getAmount()) >= 0) {
+			if (sum.compareTo(order.getAmount()) >= 0) {
 				fokCheck = true;
-			}else {
+			} else {
 				eventService.publishEvent(new CancelEvent(order, this));
 				return;
 			}
 		}
 		Order op = getOppositeQueue(order.isBid()).peek();
-		if(op == null) {
-			if(order.isMarket()) {
+		if (op == null) {
+			if (order.isMarket()) {
 				eventService.publishEvent(new CancelEvent(order, this));
-			}else {
+			} else {
 				addSameQueue(order);
 			}
 			return;
 		}
-		if(!noneMatch(order, op)) {
-			if(order.isMarket() || order.isIoc()) {
+		if (!noneMatch(order, op)) {
+			if (order.isMarket() || order.isIoc()) {
 				eventService.publishEvent(new CancelEvent(order, this));
-			}else {
+			} else {
 				addSameQueue(order);
 			}
-		}else {
-			if(op.isDone()) {
+		} else {
+			if (op.isDone()) {
 				getOppositeQueue(order.isBid()).poll();
 			}
-			if(!orderIsDone(order)) {
+			if (!orderIsDone(order)) {
 				doOrder(order);
-			}else {
-				if(order.isFok()) {
+			} else {
+				if (order.isFok()) {
 					fokCheck = false;
 				}
-				if(order.isMarket() && order.isBid() && order.getFunds().compareTo(BigDecimal.ZERO) > 0) {
+				if (order.isMarket() && order.isBid() && order.getFunds().compareTo(BigDecimal.ZERO) > 0) {
 					eventService.publishEvent(new CancelEvent(order, this));
 				}
 			}
 		}
 	}
-	
+
 	private final boolean noneMatch(Order o1, Order o2) {
-		if(o1.isAsk()^o2.isAsk()) {
-			if(o1.isAsk()) {
-				return match(o2,o1);
-			}else {
-				return match(o1,o2);
+		if (o1.isAsk() ^ o2.isAsk()) {
+			if (o1.isAsk()) {
+				return match(o2, o1);
+			} else {
+				return match(o1, o2);
 			}
-		}else {
+		} else {
 			throw new IllegalArgumentException("same side order can't make trade");
 		}
 	}
-	
+
 	/**
 	 * 成交方法
+	 * 
 	 * @param bidOrder 买单
 	 * @param askOrder 卖单
 	 * @return
 	 */
 	private final boolean match(Order bidOrder, Order askOrder) {
-		if(canMatch(bidOrder, askOrder)) {
+		if (canMatch(bidOrder, askOrder)) {
 //			BigDecimal min = bidOrder.getAmount().min(askOrder.getAmount());
 			BigDecimal min = getMinAmount(bidOrder, askOrder);
-			if(min.compareTo(BigDecimal.ZERO) == 0) {
+			if (min.compareTo(BigDecimal.ZERO) == 0) {
 				return false;
 			}
 			bidOrder.subtractAmount(min, askOrder.getPrice());
 			askOrder.subtractAmount(min, bidOrder.getPrice());
 			MatchPrice price = getPrice(bidOrder, askOrder);
-			Trade trade = new Trade(bidOrder.getId(), askOrder.getId(), price.price, min, price.maker.getId(), price.taker.getId());
+			Trade trade = new Trade(bidOrder.getId(), askOrder.getId(), price.price, min, price.maker.getId(),
+					price.taker.getId());
 			eventService.publishEvent(new TradeEvent(trade, this));
 			return true;
 		}
 		return false;
 	}
-		
+
 	private static final MatchPrice getPrice(Order o1, Order o2) {
-		if(o1.getStatus() == o2.getStatus()) {
-			throw new IllegalStateException("不能同时出现2个"+o1.getStatus());
+		if (o1.getStatus() == o2.getStatus()) {
+			throw new IllegalStateException("不能同时出现2个" + o1.getStatus());
 		}
-		if(o1.isMaker()) {
+		if (o1.isMaker()) {
 			return new MatchPrice(o1, o2);
-		}else {
+		} else {
 			return new MatchPrice(o2, o1);
 		}
 //		if(o1.getNanotime() < o2.getNanotime()) {
@@ -157,50 +158,50 @@ public class SyncEngine extends AbstractEngine {
 //			return new MatchPrice(o2, o1);
 //		}
 	}
-	
+
 	private static class MatchPrice {
 		private final Order maker;
-		
+
 		private final Order taker;
-		
+
 		private final BigDecimal price;
 
 		public MatchPrice(Order maker, Order taker) {
 			super();
-			if(maker.isMarket()) {
+			if (maker.isMarket()) {
 				throw new IllegalStateException("market order can't to be maker");
 			}
 			this.maker = maker;
 			this.taker = taker;
 			this.price = maker.getPrice();
 		}
-		
+
 	}
 
 	@Override
 	public boolean cancelOrder(String orderId, Side side) {
-		if(side.equals(Side.ASK)) {
+		if (side.equals(Side.ASK)) {
 			return cancelOrderIter(askQueue, orderId) != null;
-		}else {
+		} else {
 			return cancelOrderIter(bidQueue, orderId) != null;
 		}
 	}
-	
+
 	private void addSameQueue(Order order) {
 		order.setStatus(Status.MAKER);
 		eventService.publishEvent(new MakerEvent(order.clone(), this));
 		getSameQueue(order.isBid()).add(order);
-		
+
 	}
 
 	private Queue<Order> getOppositeQueue(boolean isBid) {
-		if(isBid) {
+		if (isBid) {
 			return askQueue;
-		}else {
+		} else {
 			return bidQueue;
 		}
 	}
-	
+
 //	private NavigableSet<Order> getOppositeSet(boolean isBid) {
 //		if(isBid) {
 //			return askQueue;
@@ -208,11 +209,11 @@ public class SyncEngine extends AbstractEngine {
 //			return bidQueue;
 //		}
 //	}
-	
+
 	private Queue<Order> getSameQueue(boolean isBid) {
-		if(isBid) {
+		if (isBid) {
 			return bidQueue;
-		}else {
+		} else {
 			return askQueue;
 		}
 	}
@@ -248,26 +249,28 @@ public class SyncEngine extends AbstractEngine {
 	public void stop() {
 		super.stop();
 	}
-	
+
 	private Order cancelOrderIter(Queue<Order> queue, String orderId) {
-		try {
-			Iterator<Order> iter = queue.iterator();
-			while(iter.hasNext()) {
-				Order order = iter.next();
-				if(order.getId().equals(orderId)) {
-					iter.remove();
-					eventService.publishEvent(new CancelEvent(order.clone(), this));
-					return order;
-				}
-			}
-			return null;
-		} finally {
-			if(queue.stream().filter(o -> {
-				return o.getId().equals(orderId);
-			}).count() > 0) {
-				throw new RuntimeException("double check faile, cancel '" + orderId + "' order failed!!!");
+//		try {
+		Iterator<Order> iter = queue.iterator();
+		while (iter.hasNext()) {
+			Order order = iter.next();
+			if (order.getId().equals(orderId)) {
+				iter.remove();
+				eventService.publishEvent(new CancelEvent(order.clone(), this));
+				return order;
 			}
 		}
+		return null;
+//		} finally {
+//			long i = queue.stream().filter(o -> {
+//				return o.getId().equals(orderId);
+//			}).count();
+//			if(i > 0) {
+//				System.out.println(orderId + " : " + i);
+////				throw new RuntimeException("double check faile, cancel '" + orderId + "' order failed!!!");
+//			}
+//		}
 	}
 
 	@Override
