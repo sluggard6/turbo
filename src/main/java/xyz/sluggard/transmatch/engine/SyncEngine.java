@@ -31,7 +31,9 @@ public class SyncEngine extends AbstractEngine {
 	private final Queue<Order> bidQueue = new PriorityBlockingQueue<>();
 
 	private final Queue<Order> askQueue = new PriorityBlockingQueue<>();
-
+	
+//	private final Set<String> idSet = new ConcurrentHashMap<String, String>().keySet();
+	
 //	private final Queue<Action> actionQueue = new ConcurrentLinkedQueue<>();
 
 	private boolean fokCheck;
@@ -50,11 +52,19 @@ public class SyncEngine extends AbstractEngine {
 
 	@Override
 	public boolean newOrder(Order order) {
+//		chekcOrderId(order);
 		order.setNanotime(System.nanoTime());
 		eventService.publishEvent(new OrderEvent(order.clone(), this));
 		doOrder(order);
 		return true;
 	}
+
+//	private void chekcOrderId(Order order) {
+//		if(order == null) throw new NullPointerException();
+//		if(idSet.contains(order.getId())) {
+//			throw new ExistedIdException(String.format("orderId %s is existed in engine", order.getId()));
+//		}
+//	}
 
 	private void doOrder(Order order) {
 		if (order.isFok() && !fokCheck) {
@@ -251,26 +261,23 @@ public class SyncEngine extends AbstractEngine {
 	}
 
 	private Order cancelOrderIter(Queue<Order> queue, String orderId) {
-//		try {
 		Iterator<Order> iter = queue.iterator();
 		while (iter.hasNext()) {
 			Order order = iter.next();
 			if (order.getId().equals(orderId)) {
 				iter.remove();
 				eventService.publishEvent(new CancelEvent(order.clone(), this));
+//				long i = queue.stream().filter(o -> {
+//					return o.getId().equals(orderId);
+//				}).count();
+//				if(i > 0) {
+//					System.out.println(orderId + " : " + i);
+//					throw new RuntimeException("double check faile, cancel '" + orderId + "' order failed!!!");
+//				}
 				return order;
 			}
 		}
 		return null;
-//		} finally {
-//			long i = queue.stream().filter(o -> {
-//				return o.getId().equals(orderId);
-//			}).count();
-//			if(i > 0) {
-//				System.out.println(orderId + " : " + i);
-////				throw new RuntimeException("double check faile, cancel '" + orderId + "' order failed!!!");
-//			}
-//		}
 	}
 
 	@Override

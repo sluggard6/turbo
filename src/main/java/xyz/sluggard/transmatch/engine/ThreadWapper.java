@@ -66,10 +66,14 @@ public class ThreadWapper implements Engine {
 	@Override
 	public boolean cancelOrder(String orderId, Side side) {
 		try {
+			long start = System.currentTimeMillis();
 			Future<Boolean> future = executorService.submit(new Command(orderId, side));
-			return future.get(TIME_OUT, TimeUnit.SECONDS);
+			boolean b = future.get(TIME_OUT, TimeUnit.SECONDS);
+			System.out.println("running time : " + (System.currentTimeMillis() - start));
+			return b;
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			log.error("cancel order error", e);
+			e.printStackTrace();
 		}
 		return false;
 	}
@@ -138,7 +142,7 @@ public class ThreadWapper implements Engine {
 	@PreDestroy
 	public void stop() {
 		executorService.shutdown();
-		proxy.start();
+		proxy.stop();
 	}
 	
 	private class Command implements Callable<Boolean> {
