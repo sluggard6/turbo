@@ -6,3 +6,4 @@
 bin
 build
 test-output
+application-local.yml

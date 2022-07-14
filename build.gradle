@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'jacoco'
 
-group = 'xyz.sluggard'
+group = 'com.github'
 version = '0.1.16-SNAPSHOT'
 
 sourceCompatibility = 1.8
@@ -45,5 +45,5 @@ task codeCoverageReport(type: JacocoReport) {
     }
 }
 
- test.useTestNG()
+test.useTestNG()
  

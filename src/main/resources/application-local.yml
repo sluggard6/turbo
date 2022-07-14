@@ -1,8 +1,0 @@
- #日志配置
-logging:
-  level:
-    root: info
-currencyPair: ETH_BTC
-
-
-
