@@ -13,22 +13,22 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import com.github.transmatch.engine.ExecutorEngine;
+import com.github.transmatch.core.Engine;
+import com.github.transmatch.engine.ThreadWapper;
 import com.github.transmatch.entity.Order;
-import com.github.transmatch.entity.Trade;
 import com.github.transmatch.entity.Order.Category;
 import com.github.transmatch.entity.Order.Side;
+import com.github.transmatch.entity.Trade;
 import com.github.transmatch.event.CancelEvent;
 import com.github.transmatch.event.EngineEvent;
 import com.github.transmatch.event.EngineListener;
 import com.github.transmatch.event.MakerEvent;
 import com.github.transmatch.event.OrderEvent;
 import com.github.transmatch.event.TradeEvent;
-import com.github.transmatch.service.impl.AbstractEventService;
 
 public class MatchTest {
 	
-	private ExecutorEngine engine;
+	private Engine engine;
 	
 	private List<EngineEvent> events = new CopyOnWriteArrayList<EngineEvent>();
 	
@@ -38,8 +38,9 @@ public class MatchTest {
 	public void init() {
 //		engine = new ExecutorEngine("BTC_USD", new DispenseEventServiceImpl());
 //		engine = new ExecutorEngine("BTC_USD", eventService);
-		engine = new ExecutorEngine("BTC_USD", new AbstractEventService() {
-		});
+		engine = new ThreadWapper("BTC_USD");
+//		engine = new ExecutorEngine("BTC_USD", new AbstractEventService() {
+//		});
 //		engine = new ExecutorEngine("BTC_USD");
 		engine.getEventService().addListener(new EngineListener() {
 			

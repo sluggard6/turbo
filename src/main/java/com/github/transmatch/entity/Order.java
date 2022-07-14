@@ -3,12 +3,10 @@ package com.github.transmatch.entity;
 import java.math.BigDecimal;
 import java.util.UUID;
 
-import com.github.transmatch.core.Sequence;
-
 import lombok.Data;
 
 @Data
-public class Order<S extends Sequence<S>> implements Comparable<Order<S>>, Cloneable{
+public class Order implements Comparable<Order>, Cloneable{
 	
 	private String id;
 	
@@ -21,8 +19,6 @@ public class Order<S extends Sequence<S>> implements Comparable<Order<S>>, Clone
 	private long nanotime;
 	
 	private long timestamp = System.currentTimeMillis();
-	
-	private Sequence<S> sequence;
 	
 	private Side side;
 	
@@ -86,20 +82,25 @@ public class Order<S extends Sequence<S>> implements Comparable<Order<S>>, Clone
 	}
 
 	@Override
-	public int compareTo(Order<S> o) {
-		if(!side.equals(o.getSide())) {
+	public int compareTo(Order o) {
+		//异边订单无法比较
+		if(!this.side.equals(o.side)) {
 			throw new IllegalArgumentException("askorder can't compare to bidorder");
 		}
+		//市价单永远大于限价单
 		int i = o.type.ordinal() - type.ordinal();
 		if(i != 0) return i;
 		if(type.equals(Type.LIMIT)) {
-			i = price.compareTo(o.getPrice());
+			//价格优先
+			i = price.compareTo(o.price);
+			//价格相同比较下单时间
 			if(i == 0) {
-				return (int) (nanotime - o.getNanotime());
+				return (int) (this.nanotime - o.nanotime);
 			}
 		}else {
-			return (int) (nanotime - o.getNanotime());
+			return (int) (this.nanotime - o.nanotime);
 		}
+		//价格不同时，根据买卖方价格顺序取反
 		if(isAsk()) {
 			return i;
 		}else {
@@ -161,11 +162,10 @@ public class Order<S extends Sequence<S>> implements Comparable<Order<S>>, Clone
 		this.extend = extend;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public Order<S> clone() {
+	public Order clone() {
 		try {
-			return (Order<S>) super.clone();
+			return (Order) super.clone();
 		} catch (CloneNotSupportedException e) {
 			throw new RuntimeException(e);
 		}

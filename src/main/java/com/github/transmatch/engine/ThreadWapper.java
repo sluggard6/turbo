@@ -20,6 +20,7 @@ import com.github.transmatch.entity.Order;
 import com.github.transmatch.entity.OrderBook;
 import com.github.transmatch.entity.Order.Side;
 import com.github.transmatch.event.OrderBookEvent;
+import com.github.transmatch.exception.EngineException;
 import com.github.transmatch.service.EventService;
 import com.github.transmatch.service.InitService;
 
@@ -121,7 +122,7 @@ public class ThreadWapper implements Engine {
 			return future.get(TIME_OUT, TimeUnit.SECONDS);
 		} catch (InterruptedException | ExecutionException | TimeoutException e) {
 			log.error("getOrderBook error", e);
-			return null;
+			throw new EngineException("getOrderBook error", e);
 		}
 	}
 

@@ -1,16 +1,16 @@
 package com.github.transmatch.engine;
 
-import com.github.transmatch.core.Sequence;
 import com.github.transmatch.core.SequenceEngine;
+import com.github.transmatch.entity.Sequence;
 import com.github.transmatch.service.EventService;
 import com.github.transmatch.service.InitService;
 import com.github.transmatch.service.SequenceMaker;
 
-public abstract class AbstractSequenceEngine extends AbstractEngine implements SequenceEngine {
+public abstract class AbstractSequenceEngine<S extends Sequence<S>> extends AbstractEngine implements SequenceEngine<S> {
 	
-	private SequenceMaker sequenceMaker;
+	private SequenceMaker<S> sequenceMaker;
 
-	public AbstractSequenceEngine(String currencyPair, EventService eventService, InitService initService, SequenceMaker sequenceMaker) {
+	public AbstractSequenceEngine(String currencyPair, EventService eventService, InitService initService, SequenceMaker<S> sequenceMaker) {
 		super(currencyPair, eventService, initService);
 		this.sequenceMaker = sequenceMaker;
 	}
@@ -27,8 +27,13 @@ public abstract class AbstractSequenceEngine extends AbstractEngine implements S
 		super(currencyPair);
 	}
 
+	public AbstractSequenceEngine(String currencyPair, SequenceMaker<S> sequenceMaker) {
+		super(currencyPair);
+		this.sequenceMaker = sequenceMaker;
+	}
+
 	@Override
-	public Sequence nextSequence() {
+	public S nextSequence() {
 		return sequenceMaker.nextSequence();
 	}
 

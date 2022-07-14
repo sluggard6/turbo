@@ -1,7 +1,8 @@
 package com.github.transmatch.core;
 
-public interface SequenceEngine extends Engine {
-	
-	<T extends Sequence<T>> Sequence<T> nextSequence();
+import com.github.transmatch.entity.Sequence;
 
+public interface SequenceEngine<S extends Sequence<S>> extends Engine {
+	
+	S nextSequence();
 }

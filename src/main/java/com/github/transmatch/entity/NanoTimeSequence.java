@@ -1,4 +1,4 @@
-package com.github.transmatch.core;
+package com.github.transmatch.entity;
 
 public class NanoTimeSequence implements Sequence<NanoTimeSequence> {
 	
