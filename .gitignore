@@ -7,3 +7,5 @@ bin
 build
 test-output
 application-local.yml
+
+.DS_Store
