@@ -32,10 +32,15 @@ public class SingleThreadPrintEventServiceImpl extends AbstractEventService {
 		@Override
 		public void run() {
 			mec.count(event);
-//			System.out.println(event);
+			getLinsteners().forEach(l->l.onEvent(event));
 		}
 		
 		
+	}
+
+	@Override
+	public void close() throws Exception {
+		executorService.shutdown();
 	}
 
 }

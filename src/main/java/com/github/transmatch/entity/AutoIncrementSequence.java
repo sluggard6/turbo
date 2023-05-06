@@ -1,6 +1,6 @@
 package com.github.transmatch.entity;
 
-public class AutoIncrementSequence implements Sequence<AutoIncrementSequence> {
+public class AutoIncrementSequence implements Sequence {
 	
 	private Long value;
 
@@ -9,8 +9,17 @@ public class AutoIncrementSequence implements Sequence<AutoIncrementSequence> {
 	}
 
 	@Override
-	public int compareTo(AutoIncrementSequence o) {
-		return Long.valueOf(this.value - o.value).intValue();
+	public int compareTo(Sequence o) {
+		if(o instanceof AutoIncrementSequence) {
+			return Long.valueOf(this.value - ((AutoIncrementSequence)o).value).intValue();
+		}else {
+			throw new IllegalArgumentException(String.format("Error Sequence Type : %s", o.getClass().getName()));
+		}
+	}
+
+	@Override
+	public String toString() {
+		return String.valueOf(value);
 	}
 
 }

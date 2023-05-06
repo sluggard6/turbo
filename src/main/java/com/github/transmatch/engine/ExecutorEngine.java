@@ -343,7 +343,8 @@ public class ExecutorEngine extends AbstractEngine{
 	}
 	
 	private static final MatchPrice getPrice(Order o1, Order o2) {
-		if(o1.getNanotime() < o2.getNanotime()) {
+//		if(o1.getNanotime() < o2.getNanotime()) {
+		if(o1.getSequence().compareTo(o2.getSequence()) < 0) {
 			return new MatchPrice(o1, o2);
 		}else {
 			return new MatchPrice(o2, o1);

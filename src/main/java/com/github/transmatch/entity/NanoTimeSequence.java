@@ -1,6 +1,6 @@
 package com.github.transmatch.entity;
 
-public class NanoTimeSequence implements Sequence<NanoTimeSequence> {
+public class NanoTimeSequence implements Sequence {
 	
 	private long nanotime;
 
@@ -10,8 +10,12 @@ public class NanoTimeSequence implements Sequence<NanoTimeSequence> {
 	}
 
 	@Override
-	public int compareTo(NanoTimeSequence o) {
-		return Long.valueOf(this.nanotime - o.nanotime).intValue();
+	public int compareTo(Sequence o) {
+		if(o instanceof NanoTimeSequence) {
+			return Long.valueOf(this.nanotime - ((NanoTimeSequence)o).nanotime).intValue();
+		}else {
+			throw new IllegalArgumentException(String.format("Error Sequence Type : %s", o.getClass().getName()));
+		}
 	}
 
 }

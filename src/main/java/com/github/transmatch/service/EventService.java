@@ -5,7 +5,7 @@ import java.util.Set;
 import com.github.transmatch.event.EngineEvent;
 import com.github.transmatch.event.EngineListener;
 
-public interface EventService {
+public interface EventService extends AutoCloseable{
 
 	void addListener(EngineListener listener);
 	

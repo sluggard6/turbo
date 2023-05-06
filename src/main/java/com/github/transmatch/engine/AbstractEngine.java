@@ -10,6 +10,7 @@ import javax.annotation.PreDestroy;
 
 import com.github.transmatch.core.Engine;
 import com.github.transmatch.entity.Order;
+import com.github.transmatch.entity.SequenceOrder;
 import com.github.transmatch.event.EngineDestoryEvent;
 import com.github.transmatch.event.EngineStartUpEvent;
 import com.github.transmatch.service.EventService;
@@ -142,6 +143,10 @@ public abstract class AbstractEngine implements Engine{
 		}else {
 			return order.isDone();
 		}
+	}
+	
+	protected void newSequenceOrder(SequenceOrder sequenceOrder) {
+		
 	}
 
 }

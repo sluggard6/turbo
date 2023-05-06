@@ -7,9 +7,9 @@ import lombok.EqualsAndHashCode;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-public class SequenceOrder<S extends Sequence<S>> extends Order {
+public class SequenceOrder extends Order {
 	
-	private S sequence;
+	private Sequence sequence;
 
 	public SequenceOrder(BigDecimal price, BigDecimal amount, Side side) {
 		super(price, amount, side);
@@ -42,8 +42,7 @@ public class SequenceOrder<S extends Sequence<S>> extends Order {
 
 	@Override
 	public int compareTo(Order o) {
-		@SuppressWarnings("unchecked")
-		SequenceOrder<S> other = (SequenceOrder<S>) o;
+		SequenceOrder other = (SequenceOrder) o;
 		//异边订单无法比较
 		if(!this.getSide().equals(other.getSide())) {
 			throw new IllegalArgumentException("askorder can't compare to bidorder");

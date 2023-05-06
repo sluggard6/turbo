@@ -9,41 +9,44 @@ A Market Order Matching Engine
 ## Getting started
 
 ```java
-package xyz.sluggard.turbo.demo;
+package com.github.turbo.demo;
 
 import java.math.BigDecimal;
 
-import xyz.sluggard.transmatch.core.Engine;
-import xyz.sluggard.transmatch.engine.ExecutorEngine;
-import xyz.sluggard.transmatch.entity.Order;
-import xyz.sluggard.transmatch.entity.Order.Side;
-import xyz.sluggard.transmatch.event.EngineEvent;
-import xyz.sluggard.transmatch.event.EngineListener;
-import xyz.sluggard.transmatch.service.EventService;
-import xyz.sluggard.transmatch.service.impl.EventServiceImpl;
+import com.github.transmatch.core.Engine;
+import com.github.transmatch.engine.ThreadWapper;
+import com.github.transmatch.entity.Order;
+import com.github.transmatch.entity.Order.Side;
+import com.github.transmatch.event.EngineEvent;
+import com.github.transmatch.event.EngineListener;
+import com.github.transmatch.service.EventService;
+import com.github.transmatch.service.SingleThreadPrintEventServiceImpl;
 
 public class Test {
 	
 	public static void main(String... args) {
-		EventService eventService = new EventServiceImpl();
-		eventService.addListener(new EngineListener() {
-
-			@Override
-			public void onEvent(EngineEvent event) {
-				System.out.println(event);
-			}
-		});
-		Engine engine = new ExecutorEngine("BTC_USD", eventService);
-		engine.start();
-		
-		Order askOrder = new Order("1", new BigDecimal(100), new BigDecimal(10), Side.ASK);
-		Order bidOrder = new Order("2", new BigDecimal(100), new BigDecimal(20), Side.BID);
-		engine.newOrder(askOrder);
-		engine.newOrder(bidOrder);
-		
-		engine.stop();
+		try(EventService eventService = new SingleThreadPrintEventServiceImpl()) {
+			eventService.addListener(new EngineListener() {
+	
+				@Override
+				public void onEvent(EngineEvent event) {
+					System.out.println(event);
+				}
+			});
+			Engine engine = new ThreadWapper("BTC_USDT", eventService);
+			engine.start();
+			
+			Order askOrder = new Order("1", new BigDecimal(100), new BigDecimal(10), Side.ASK);
+			Order bidOrder = new Order("2", new BigDecimal(100), new BigDecimal(20), Side.BID);
+			engine.newOrder(askOrder);
+			engine.newOrder(bidOrder);
+			Thread.sleep(1000);
+			engine.stop();
+		} catch (Exception e){
+			e.printStackTrace();
+		}
 	}
-
+	
 }
 
 ```

@@ -16,7 +16,8 @@ public class Order implements Comparable<Order>, Cloneable{
 	
 	private BigDecimal funds;
 	
-	private long nanotime;
+//	private long nanotime;
+	private Sequence sequence;
 	
 	private long timestamp = System.currentTimeMillis();
 	
@@ -95,10 +96,12 @@ public class Order implements Comparable<Order>, Cloneable{
 			i = price.compareTo(o.price);
 			//价格相同比较下单时间
 			if(i == 0) {
-				return (int) (this.nanotime - o.nanotime);
+//				return (int) (this.nanotime - o.nanotime);
+				return this.sequence.compareTo(o.sequence);
 			}
 		}else {
-			return (int) (this.nanotime - o.nanotime);
+//			return (int) (this.nanotime - o.nanotime);
+			return this.sequence.compareTo(o.sequence);
 		}
 		//价格不同时，根据买卖方价格顺序取反
 		if(isAsk()) {

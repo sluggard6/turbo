@@ -22,19 +22,11 @@ import com.github.transmatch.service.EventService;
 import com.github.transmatch.service.InitService;
 import com.github.transmatch.utils.IdManager;
 
-public class SyncEngine extends AbstractEngine {
-
-//	private final SortedSetQueue<Order> bidQueue = new SortedSetQueue<>(new SideComparator());
-//
-//	private final SortedSetQueue<Order> askQueue = new SortedSetQueue<>(new SideComparator());
+public class SyncEngine extends AbstractSequenceEngine {
 
 	private final Queue<Order> bidQueue = new PriorityBlockingQueue<>();
 
 	private final Queue<Order> askQueue = new PriorityBlockingQueue<>();
-	
-//	private final Set<String> idSet = new ConcurrentHashMap<String, String>().keySet();
-	
-//	private final Queue<Action> actionQueue = new ConcurrentLinkedQueue<>();
 
 	private boolean fokCheck;
 
@@ -53,7 +45,8 @@ public class SyncEngine extends AbstractEngine {
 	@Override
 	public boolean newOrder(Order order) {
 //		chekcOrderId(order);
-		order.setNanotime(System.nanoTime());
+//		order.setNanotime(System.nanoTime());
+		order.setSequence(nextSequence());
 		eventService.publishEvent(new OrderEvent(order.clone(), this));
 		doOrder(order);
 		return true;

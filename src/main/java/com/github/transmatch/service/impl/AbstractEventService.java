@@ -33,5 +33,9 @@ public abstract class AbstractEventService implements EventService {
 		return Collections.unmodifiableSet(listeners);
 	}
 	
+	public void close() throws Exception{
+		
+	}
+	
 }
 
